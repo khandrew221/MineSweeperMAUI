@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34202.233
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MineSweeperMAUI", "MineSweeperMAUI\MineSweeperMAUI.csproj", "{7BFF2C92-9016-46A2-8C3E-D066AA70CDC2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MAUI frontend", "MineSweeperMAUI\MAUI frontend.csproj", "{7BFF2C92-9016-46A2-8C3E-D066AA70CDC2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MineSweeper", "MineSweeper\MineSweeper.csproj", "{98E3895E-F1B3-484B-89FB-05B6B90E7F04}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MineSweeperTests", "MineSweeperTests\MineSweeperTests.csproj", "{C6C6E35D-0582-417A-B5B7-2ECC4B421E11}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,6 +21,14 @@ Global
 		{7BFF2C92-9016-46A2-8C3E-D066AA70CDC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7BFF2C92-9016-46A2-8C3E-D066AA70CDC2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7BFF2C92-9016-46A2-8C3E-D066AA70CDC2}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{98E3895E-F1B3-484B-89FB-05B6B90E7F04}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98E3895E-F1B3-484B-89FB-05B6B90E7F04}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98E3895E-F1B3-484B-89FB-05B6B90E7F04}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98E3895E-F1B3-484B-89FB-05B6B90E7F04}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C6C6E35D-0582-417A-B5B7-2ECC4B421E11}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C6C6E35D-0582-417A-B5B7-2ECC4B421E11}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C6C6E35D-0582-417A-B5B7-2ECC4B421E11}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C6C6E35D-0582-417A-B5B7-2ECC4B421E11}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

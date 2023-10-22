@@ -1,4 +1,5 @@
-﻿
+﻿using MineSweeper;
+
 namespace MineSweeperMAUI
 {
     public partial class MainPage : ContentPage
@@ -12,7 +13,7 @@ namespace MineSweeperMAUI
             InitializeComponent();
 
             // Make the game. TEMPORARY, NEEDS CONTROLLER
-            MineSweeper game = new MineSweeper(20, 20);
+            MineSweeperGame game = new MineSweeperGame(20, 20);
 
             // Make the view's grid of buttons
             MakeButtonGrid(20, 20, 30);
@@ -23,7 +24,8 @@ namespace MineSweeperMAUI
 
         }
 
-        /// <summary>
+       
+/// <summary>
         /// Creates the interactive button grid that forms the main view of and method of with the game field.
         /// </summary>
         /// <param name="width">int, >0 (work on better constraints/recommended values later)</param>
