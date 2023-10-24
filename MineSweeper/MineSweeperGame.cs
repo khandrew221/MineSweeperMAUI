@@ -20,7 +20,7 @@ namespace MineSweeper
 
         /// <summary>
         /// Class constructor, initialising a grid of the specified width and height. Grid size can
-        /// be changed later (!!!not currently)
+        /// be changed later (!!!not currently). Values expected to be >0.
         /// </summary>
         public MineSweeperGame(int width, int height)
         {
@@ -49,6 +49,18 @@ namespace MineSweeper
         public int Height()
         {
             return cellGrid.HEIGHT;
+        }
+
+        /// <summary>
+        /// Returns the set of indices for cells neighbouring the given location, or an empty
+        /// set if the location is invalid. 
+        /// </summary>
+        /// <param name="x">The x location</param>
+        /// <param name="y">The y location</param>
+        /// <returns>A set of ints representing the indices of neighbouring cells, or an empty set if the given location is invalid.</returns>
+        public HashSet<int> NeighboursOf(int x, int y)
+        {
+            return cellGrid.GenerateNeighboursSet(x, y);
         }
 
         /// <summary>
@@ -104,60 +116,10 @@ namespace MineSweeper
                         //assign an empty neighbour set for the cell
                         cells[cellIndex].neighbours = new HashSet<Cell>();
 
-                        //check direct left for a cell, and add it as a neighbour if it exists
-                        int neighbourIndex = XYToIndex(x - 1, y);
-                        if (neighbourIndex != -1)
+                        //assign all neighbours
+                        foreach (int i in GenerateNeighboursSet(x, y))
                         {
-                            cells[cellIndex].neighbours.Add(cells[neighbourIndex]);
-                        }
-
-                        //same for lower left
-                        neighbourIndex = XYToIndex(x - 1, y - 1);
-                        if (neighbourIndex != -1)
-                        {
-                            cells[cellIndex].neighbours.Add(cells[neighbourIndex]);
-                        }
-
-                        //and upper left
-                        neighbourIndex = XYToIndex(x - 1, y + 1);
-                        if (neighbourIndex != -1)
-                        {
-                            cells[cellIndex].neighbours.Add(cells[neighbourIndex]);
-                        }
-
-                        //check direct right
-                        neighbourIndex = XYToIndex(x + 1, y);
-                        if (neighbourIndex != -1)
-                        {
-                            cells[cellIndex].neighbours.Add(cells[neighbourIndex]);
-                        }
-
-                        //same for lower right
-                        neighbourIndex = XYToIndex(x + 1, y - 1);
-                        if (neighbourIndex != -1)
-                        {
-                            cells[cellIndex].neighbours.Add(cells[neighbourIndex]);
-                        }
-
-                        //and upper right
-                        neighbourIndex = XYToIndex(x + 1, y + 1);
-                        if (neighbourIndex != -1)
-                        {
-                            cells[cellIndex].neighbours.Add(cells[neighbourIndex]);
-                        }
-
-                        //directly above
-                        neighbourIndex = XYToIndex(x, y + 1);
-                        if (neighbourIndex != -1)
-                        {
-                            cells[cellIndex].neighbours.Add(cells[neighbourIndex]);
-                        }
-
-                        //and directly below
-                        neighbourIndex = XYToIndex(x, y - 1);
-                        if (neighbourIndex != -1)
-                        {
-                            cells[cellIndex].neighbours.Add(cells[neighbourIndex]);
+                            cells[cellIndex].neighbours.Add(cells[i]);
                         }
                     }
                 }
@@ -185,6 +147,7 @@ namespace MineSweeper
 
             /// <summary>
             /// TESTING. Returns the number of cells in the cell array.
+            /// !!! Overly defensive, should be no point where cells is null
             /// </summary>
             public int NumberOfCells()
             {
@@ -197,6 +160,97 @@ namespace MineSweeper
                     return -1;
                 }
             }
+
+            /// <summary>
+            /// Returns the neighbour set for the given cell, or an empty set if x,y value
+            /// is invalid
+            /// <param name="x">The x position of the cell. Out of bounds values are caught and return an empty set.</param>
+            /// <param name="y">The y position of the cell. Out of bounds values are caught and return an empty set.</param>
+            /// <returns>The set of cells that are neighbours of this one, otherwise an empty set.
+            /// </summary>
+            public HashSet<Cell> NeighboursOf(int x, int y)
+            {
+                int index = XYToIndex(x, y);
+                if (index >= 0)
+                {
+                    return cells[index].neighbours;
+                } else
+                {
+                    return new HashSet<Cell>();
+                }
+            }
+
+            /// <summary>
+            /// Calculates the set of indices for the neighbours of a given cell location. 
+            /// <param name="x">The x position of the cell. Out of bounds values are caught and return an empty set.</param>
+            /// <param name="y">The y position of the cell. Out of bounds values are caught and return an empty set.</param>
+            /// <returns>The set of cells that are neighbours of this one, otherwise an empty set.
+            /// </summary>
+            public HashSet<int> GenerateNeighboursSet(int x, int y)
+            {
+                HashSet<int> output = new HashSet<int>();
+
+                int index = XYToIndex(x, y);
+                if (index >= 0) //if valid index
+                {
+                    //check direct left for a cell, and add it as a neighbour if it exists
+                    int neighbourIndex = XYToIndex(x - 1, y);
+                    if (neighbourIndex != -1)
+                    {
+                        output.Add(neighbourIndex);
+                    }
+
+                    //same for lower left
+                    neighbourIndex = XYToIndex(x - 1, y - 1);
+                    if (neighbourIndex != -1)
+                    {
+                        output.Add(neighbourIndex);
+                    }
+
+                    //and upper left
+                    neighbourIndex = XYToIndex(x - 1, y + 1);
+                    if (neighbourIndex != -1)
+                    {
+                        output.Add(neighbourIndex);
+                    }
+
+                    //check direct right
+                    neighbourIndex = XYToIndex(x + 1, y);
+                    if (neighbourIndex != -1)
+                    {
+                        output.Add(neighbourIndex);
+                    }
+
+                    //same for lower right
+                    neighbourIndex = XYToIndex(x + 1, y - 1);
+                    if (neighbourIndex != -1)
+                    {
+                        output.Add(neighbourIndex);
+                    }
+
+                    //and upper right
+                    neighbourIndex = XYToIndex(x + 1, y + 1);
+                    if (neighbourIndex != -1)
+                    {
+                        output.Add(neighbourIndex);
+                    }
+
+                    //directly above
+                    neighbourIndex = XYToIndex(x, y + 1);
+                    if (neighbourIndex != -1)
+                    {
+                        output.Add(neighbourIndex);
+                    }
+
+                    //and directly below
+                    neighbourIndex = XYToIndex(x, y - 1);
+                    if (neighbourIndex != -1)
+                    {
+                        output.Add(neighbourIndex);
+                    }
+                }
+                return output;
+            } 
         }
 
         /// <summary>
@@ -215,7 +269,7 @@ namespace MineSweeper
             /// <summary>
             /// A reference to each directly neighbouring cell, including diagonals
             /// </summary>
-            public HashSet<Cell> neighbours;
+            public HashSet<Cell> neighbours = new HashSet<Cell>();
         }
     }
 
