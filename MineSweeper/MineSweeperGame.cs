@@ -1,6 +1,4 @@
-﻿using static MineSweeper.MineSweeperGame;
-
-namespace MineSweeper
+﻿namespace MineSweeper
 {
     /// <summary>
     /// This class encapsulates and handles the mechanics of a Minesweeper game. It is purposefully
@@ -84,6 +82,26 @@ namespace MineSweeper
             private Cell[] cells;
 
             /// <summary>
+            /// Handles the state of individual cells in the game grid
+            /// </summary>
+            public class Cell
+            {
+                /// <summary>
+                /// Whether or not the cell is hidden.
+                /// </summary>
+                public bool isHidden = true;
+                /// <summary>
+                ///  Whether or not the cell is a bomb.
+                /// </summary>
+                public bool isBomb = false;
+                /// <summary>
+                /// A reference to each directly neighbouring cell, including diagonals
+                /// </summary>
+                public HashSet<Cell> neighbours = new HashSet<Cell>();
+            }
+
+
+            /// <summary>
             /// Cell grid constructor. Note that this does not set up a new game state, only
             /// a grid of empty cells with neighbours set. The grid's size is fixed for its lifetime;
             /// a new CellGrid must be made to change grid size. This is a measure to prevent mismatches
@@ -133,7 +151,7 @@ namespace MineSweeper
             /// <returns>The index of the cell at this x,y location, otherwise -1 as an error value.</returns>
             public int XYToIndex(int x, int y)
             {
-                if (0 <= x && x < WIDTH && 0 <= y && y < HEIGHT)
+                if (InGrid(x,y))
                 {
                     //if the x and y values are within the grid, return an index
                     return y * WIDTH + x;
@@ -154,16 +172,29 @@ namespace MineSweeper
                 try
                 {
                     return cells.Length;
-                } 
-                catch (ArgumentNullException e) 
+                }
+                catch (ArgumentNullException e)
                 {
                     return -1;
                 }
             }
 
             /// <summary>
+            /// Checks if the given x,y values is within the grid. Returns true if it is,
+            /// false otherwise.
+            /// </summary>
+            /// <param name="x">The x location</param>
+            /// <param name="y">The y location</param>
+            /// <returns>True if within the grid, false otherwise</returns>
+            public bool InGrid(int x, int y)
+            {
+                return 0 <= x && x < WIDTH && 0 <= y && y < HEIGHT;
+            }
+
+            /// <summary>
             /// Returns the neighbour set for the given cell, or an empty set if x,y value
             /// is invalid
+            /// !!!!! Redundant?
             /// <param name="x">The x position of the cell. Out of bounds values are caught and return an empty set.</param>
             /// <param name="y">The y position of the cell. Out of bounds values are caught and return an empty set.</param>
             /// <returns>The set of cells that are neighbours of this one, otherwise an empty set.
@@ -174,7 +205,8 @@ namespace MineSweeper
                 if (index >= 0)
                 {
                     return cells[index].neighbours;
-                } else
+                }
+                else
                 {
                     return new HashSet<Cell>();
                 }
@@ -190,86 +222,25 @@ namespace MineSweeper
             {
                 HashSet<int> output = new HashSet<int>();
 
-                int index = XYToIndex(x, y);
-                if (index >= 0) //if valid index
+                if (InGrid(x, y)) //if valid location
                 {
-                    //check direct left for a cell, and add it as a neighbour if it exists
-                    int neighbourIndex = XYToIndex(x - 1, y);
-                    if (neighbourIndex != -1)
-                    {
-                        output.Add(neighbourIndex);
-                    }
+                    //Add index values for all possible neighbour cells. None-existent neighbours
+                    //at edges and corners will add the value -1 to the set. 
+                    output.Add(XYToIndex(x - 1, y));
+                    output.Add(XYToIndex(x - 1, y - 1));
+                    output.Add(XYToIndex(x - 1, y + 1));
+                    output.Add(XYToIndex(x + 1, y));
+                    output.Add(XYToIndex(x + 1, y - 1));
+                    output.Add(XYToIndex(x + 1, y + 1));
+                    output.Add(XYToIndex(x, y + 1));
+                    output.Add(XYToIndex(x, y - 1));
 
-                    //same for lower left
-                    neighbourIndex = XYToIndex(x - 1, y - 1);
-                    if (neighbourIndex != -1)
-                    {
-                        output.Add(neighbourIndex);
-                    }
-
-                    //and upper left
-                    neighbourIndex = XYToIndex(x - 1, y + 1);
-                    if (neighbourIndex != -1)
-                    {
-                        output.Add(neighbourIndex);
-                    }
-
-                    //check direct right
-                    neighbourIndex = XYToIndex(x + 1, y);
-                    if (neighbourIndex != -1)
-                    {
-                        output.Add(neighbourIndex);
-                    }
-
-                    //same for lower right
-                    neighbourIndex = XYToIndex(x + 1, y - 1);
-                    if (neighbourIndex != -1)
-                    {
-                        output.Add(neighbourIndex);
-                    }
-
-                    //and upper right
-                    neighbourIndex = XYToIndex(x + 1, y + 1);
-                    if (neighbourIndex != -1)
-                    {
-                        output.Add(neighbourIndex);
-                    }
-
-                    //directly above
-                    neighbourIndex = XYToIndex(x, y + 1);
-                    if (neighbourIndex != -1)
-                    {
-                        output.Add(neighbourIndex);
-                    }
-
-                    //and directly below
-                    neighbourIndex = XYToIndex(x, y - 1);
-                    if (neighbourIndex != -1)
-                    {
-                        output.Add(neighbourIndex);
-                    }
+                    //Remove -1 from the set if it exists. The remaining set is the set of
+                    //neighbour indices.
+                    output.Remove(-1);
                 }
                 return output;
-            } 
-        }
-
-        /// <summary>
-        /// Handles the state of individual cells in the game grid
-        /// </summary>
-        public class Cell
-        {
-            /// <summary>
-            /// Whether or not the cell is hidden.
-            /// </summary>
-            public bool isHidden = true;
-            /// <summary>
-            ///  Whether or not the cell is a bomb.
-            /// </summary>
-            public bool isBomb = false;
-            /// <summary>
-            /// A reference to each directly neighbouring cell, including diagonals
-            /// </summary>
-            public HashSet<Cell> neighbours = new HashSet<Cell>();
+            }
         }
     }
 
