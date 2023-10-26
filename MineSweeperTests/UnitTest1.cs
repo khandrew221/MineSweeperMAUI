@@ -46,6 +46,8 @@ namespace MineSweeperTests
 
             //
             TestNeighbourAssignment();
+
+            TestBombDistribution(5,5);
         }
 
         public void TestSizeValues(int width, int height)
@@ -167,6 +169,16 @@ namespace MineSweeperTests
             Assert.IsTrue(values.Count == 0);
             values = game.NeighboursOf(100, -40);
             Assert.IsTrue(values.Count == 0);
+        }
+
+        public void TestBombDistribution(int width, int height)
+        {
+            float bombDensity = 0.3f;
+            MineSweeperGame game = new MineSweeperGame(width, height);
+
+            game.SetupGame();
+
+            Assert.AreEqual((int)Math.Floor(width * height * bombDensity), game.AllBombs().Count);
         }
     }
 }

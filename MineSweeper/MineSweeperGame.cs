@@ -14,7 +14,7 @@
         /// <summary>
         /// Reports on the state of the game: 0 for active, -1 for loss state, 1 for a win state 
         /// </summary>
-        public int GameOver { get; private set; }
+        public int GameState { get; private set; }
 
         /// <summary>
         /// Class constructor, initialising a grid of the specified width and height. Grid size can
@@ -23,6 +23,14 @@
         public MineSweeperGame(int width, int height)
         {
             cellGrid = new CellGrid(width, height);
+        }
+
+        /// <summary>
+        /// Sets up the game with current grid size and bomb density.
+        /// </summary>
+        public void SetupGame()
+        {
+            cellGrid.SetGrid();
         }
 
         /// <summary>
@@ -62,6 +70,15 @@
         }
 
         /// <summary>
+        /// Returns the set of indices for all bombs in the grid.
+        /// </summary>
+        /// <returns></returns>
+        public HashSet<int> AllBombs()
+        {
+            return cellGrid.FindBombs();
+        }
+
+        /// <summary>
         /// Encapsulates the storage and processing of individual cells. 
         /// Due to the cells being stored as a single dimensional array, a new CellGrid must be 
         /// created whenever the grid size is changed. 
@@ -77,9 +94,14 @@
             /// </summary>
             public int HEIGHT { get; private set; }
             /// <summary>
+            /// Density of bombs.
+            /// </summary>
+            public float bombDensity { get; private set; }
+            /// <summary>
             /// Array holding the Cell objects that make up the grid
             /// </summary>
             private Cell[] cells;
+
 
             /// <summary>
             /// Handles the state of individual cells in the game grid
@@ -115,6 +137,7 @@
                 //set width and height
                 WIDTH = width;
                 HEIGHT = height;
+                bombDensity = 0.3f;
                 cells = new Cell[WIDTH * HEIGHT];
 
                 //create the array of cells
@@ -140,6 +163,20 @@
                             cells[cellIndex].neighbours.Add(cells[i]);
                         }
                     }
+                }
+            }
+
+            /// <summary>
+            /// Sets or resets the grid for a game.
+            /// </summary>
+            public void SetGrid()
+            {
+                HashSet<int> bombs = GenerateBombSet((int)Math.Floor(WIDTH*HEIGHT*bombDensity));
+
+                for (int i = 0; i < cells.Length; i++)
+                {
+                    cells[i].isHidden = true;
+                    cells[i].isBomb = bombs.Contains(i);
                 }
             }
 
@@ -238,6 +275,42 @@
                     //Remove -1 from the set if it exists. The remaining set is the set of
                     //neighbour indices.
                     output.Remove(-1);
+                }
+                return output;
+            }
+
+            /// <summary>
+            /// Generates a random set of bomb locations of the given size.
+            /// !!!Unhappy about this implementation. Risk of infinite loop if size > WIDTH * HEIGHT. 
+            /// </summary>
+            /// <param name="size">The size of the set to be generated</param>
+            /// <returns>A set of random integers between 0(inclusive) and WIDTH * HEIGHT(exclusive) of the given length.</returns>
+            private HashSet<int> GenerateBombSet(int size)
+            {
+                Random rnd = new Random();
+                HashSet<int> output = new HashSet<int>();
+
+                //add values to the set until it reaches the required size 
+                while (output.Count < size)
+                {
+                    output.Add(rnd.Next(0, WIDTH * HEIGHT));
+                }
+
+                return output;
+            }
+
+            /// <summary>
+            /// Brute force searches for all bombs.
+            /// </summary>
+            /// <returns>A set of all cell indices that are bombs.</returns>
+            public HashSet<int> FindBombs()
+            {
+                HashSet<int> output = new HashSet<int>();
+                for (int i = 0; i < cells.Length; i++)
+                {
+                    if (cells[i].isBomb)
+                        output.Add(i);
+
                 }
                 return output;
             }
