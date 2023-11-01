@@ -3,10 +3,15 @@
     /// <summary>
     /// This class encapsulates and handles the mechanics of a Minesweeper game. It is purposefully
     /// decoupled from any interface coding, allowing for easy reuse of game code with different 
-    /// interfaces, and acts as the Model of an MVC pattern. 
+    /// interfaces, and acts as the Model of an MVC pattern. Defensive programming to catch bad 
+    /// values being passed into functions should take place here if at all possible.
     /// </summary>
     public class MineSweeperGame
     {
+        public const int BOMB = -2;
+        public const int HIDDEN = -1;
+        public const int OOB = -3;
+
         /// <summary>
         /// Handles the grid of cells that make up the game
         /// </summary>
@@ -106,6 +111,24 @@
         }
 
         /// <summary>
+        /// Returns an int representing the current state of the given cell.
+        /// HIDDEN const represents hidden cells 
+        /// Revealed non-bomb cells are represented by their number of bomb neighbours (0-8).
+        /// BOMB const represents a revealed bomb. 
+        /// OOB const represents an out of bounds cell index
+        /// </summary>
+        /// <param name="i">the index of the cell</param>
+        /// <returns>An int representing the current state of the given cell.</returns>
+        public int CellState(int i)
+        {
+            if(i >= 0 && i < NumberOfCells())
+            {
+                return cellGrid.State(i);
+            }
+            else { return OOB; }
+        }
+
+        /// <summary>
         /// Encapsulates the storage and processing of individual cells. 
         /// Due to the cells being stored as a single dimensional array, a new CellGrid must be 
         /// created whenever the grid size is changed. 
@@ -147,6 +170,44 @@
                 /// A reference to each directly neighbouring cell, including diagonals
                 /// </summary>
                 public HashSet<Cell> neighbours = new HashSet<Cell>();
+
+                /// <summary>
+                /// Returns the number of bombs neighbouring this cell
+                /// </summary>
+                /// <returns>The number of bombs neighbouring this cell as an int</returns>
+                public int NeighborBombs()
+                {
+                    int output = 0;
+                    foreach (Cell cell in neighbours)
+                    {
+                        if (cell.isBomb)
+                            output++;
+                    }
+                    return output;
+                }
+
+                /// <summary>
+                /// Returns an int representing the current state of the cell.
+                /// HIDDEN const represents hidden cells 
+                /// Revealed non-bomb cells are represented by their number of bomb neighbours (0-8).
+                /// BOMB const represents a revealed bomb. 
+                /// </summary>
+                /// <returns>An int representing the current state of the cell.</returns>
+                public int State()
+                {
+                    if (!isHidden)
+                    {
+                        if (isBomb)
+                        {
+                            return BOMB;
+                        } 
+                        else
+                        {
+                            return NeighborBombs();
+                        }
+                    }
+                    return HIDDEN;
+                } 
             }
 
 
@@ -208,7 +269,19 @@
             }
 
             /// <summary>
-            /// Converts an (x,y) value to the index of the cell at that position, or -1 if the (x,y) value is not valid.
+            /// Returns an int representing the current state of each cell in the game grid. 
+            /// HIDDEN const represents hidden cells 
+            /// Revealed non-bomb cells are represented by their number of bomb neighbours (0-8).
+            /// BOMB const represents a revealed bomb. 
+            /// </summary>
+            /// <returns>An int representing the current state of the given cell.</returns>
+            public int State(int i)
+            {
+                return cells[i].State();
+            }
+
+            /// <summary>
+            /// Converts an (x,y) value to the index of the cell at that position, or OOB const if the (x,y) value is not valid.
             /// </summary>
             /// <param name="x">The x value to be converted. Out of bounds values are caught and return an error.</param>
             /// <param name="y">The x value to be converted. Out of bounds values are caught and return an error.</param>
@@ -223,7 +296,7 @@
                 else
                 {
                     //otherwise, return an error value
-                    return -1;
+                    return OOB;
                 }
             }
 
@@ -299,9 +372,9 @@
                     output.Add(XYToIndex(x, y + 1));
                     output.Add(XYToIndex(x, y - 1));
 
-                    //Remove -1 from the set if it exists. The remaining set is the set of
+                    //Remove OOB from the set if it exists. The remaining set is the set of
                     //neighbour indices.
-                    output.Remove(-1);
+                    output.Remove(OOB);
                 }
                 return output;
             }

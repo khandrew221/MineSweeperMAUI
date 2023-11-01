@@ -48,6 +48,11 @@ namespace MineSweeperTests
             TestNeighbourAssignment();
 
             TestBombDistribution(5,5);
+
+
+            TestCellStateReporting(10, 15);
+
+
         }
 
         public void TestSizeValues(int width, int height)
@@ -209,5 +214,26 @@ namespace MineSweeperTests
 
             Assert.AreEqual((int)Math.Floor(width * height * testDensity), game.AllBombs().Count);
         }
+
+        public void TestCellStateReporting(int width, int height)
+        {
+            MineSweeperGame game = new MineSweeperGame(width, height);
+            game.SetupGame();
+
+            //test OOB index values
+            Assert.AreNotEqual(game.CellState(0), MineSweeperGame.OOB);
+            Assert.AreNotEqual(game.CellState(width*height-1), MineSweeperGame.OOB);
+            Assert.AreEqual(game.CellState(width * height), MineSweeperGame.OOB);
+            Assert.AreEqual(game.CellState(width * height * 2), MineSweeperGame.OOB);
+            Assert.AreEqual(game.CellState(-1), MineSweeperGame.OOB);
+            Assert.AreEqual(game.CellState(-100), MineSweeperGame.OOB);
+
+            //initial setup; all cells should be hidden
+            for (int i = 0; i < width*height; i++)
+            {
+                Assert.AreEqual(game.CellState(i), MineSweeperGame.HIDDEN);
+            }
+
+        } 
     }
 }

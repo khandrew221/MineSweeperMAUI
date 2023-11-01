@@ -31,7 +31,6 @@ namespace MineSweeperMAUI
         /// <param name="width">int, >0 (work on better constraints/recommended values later)</param>
         /// <param name="height">int, >0 (work on better constraints/recommended values later)</param>
         /// <param name="buttonSize">int, >0 (work on better constraints/recommended values later)</param>
-        /// <param name="game"> TEMPORARY, should link to MAUI adapter/controller not direct to model class</param>
         private void MakeButtonGrid(int width, int height, int buttonSize)
         {
             grid = new Grid();
