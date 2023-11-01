@@ -173,12 +173,41 @@ namespace MineSweeperTests
 
         public void TestBombDistribution(int width, int height)
         {
-            float bombDensity = 0.3f;
             MineSweeperGame game = new MineSweeperGame(width, height);
+            float defaultDensity = 0.3f;
+
+            ///test setting density values (0 to 0.5 exclusive expected)
+            Assert.IsFalse(game.SetBombDensity(0));
+            Assert.IsTrue(game.BombDensity() == defaultDensity);
+
+            Assert.IsFalse(game.SetBombDensity(0.5f));
+            Assert.IsTrue(game.BombDensity() == defaultDensity);
+
+            Assert.IsTrue(game.SetBombDensity(0.000001f));
+            Assert.IsTrue(game.BombDensity() == 0.000001f);
+
+            Assert.IsTrue(game.SetBombDensity(0.4999999f));
+            Assert.IsTrue(game.BombDensity() == 0.4999999f);
+
+            Assert.IsTrue(game.SetBombDensity(0.1f));
+            Assert.IsTrue(game.BombDensity() == 0.1f);
+
+            Assert.IsTrue(game.SetBombDensity(0.4f));
+            Assert.IsTrue(game.BombDensity() == 0.4f);
+
+            Assert.IsFalse(game.SetBombDensity(1));
+            Assert.IsTrue(game.BombDensity() == 0.4f);
+
+            Assert.IsFalse(game.SetBombDensity(-1));
+            Assert.IsTrue(game.BombDensity() == 0.4f);
+
+            float testDensity = 0.2f;
+
+            Assert.IsTrue(game.SetBombDensity(testDensity));
 
             game.SetupGame();
 
-            Assert.AreEqual((int)Math.Floor(width * height * bombDensity), game.AllBombs().Count);
+            Assert.AreEqual((int)Math.Floor(width * height * testDensity), game.AllBombs().Count);
         }
     }
 }

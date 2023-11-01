@@ -79,6 +79,33 @@
         }
 
         /// <summary>
+        /// Sets the bomb density. Expected input value between 0 and 0.5 exclusive, other values will return false with no change to game parameters.
+        /// </summary>
+        /// <param name="density">float. Expected between 0 and 0.5 exclusive, other values will return false with no change to game parameters.</param>
+        /// <returns>true if the density has been changed, false otherwise</returns>
+        public bool SetBombDensity(float density)
+        {
+            if (density > 0 && density < 0.5f)
+            {
+                cellGrid.bombDensity = density;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Returns the bomb density as a float.
+        /// </summary>
+        /// <returns></returns>
+        public float BombDensity() 
+        { 
+            return cellGrid.bombDensity; 
+        }
+
+        /// <summary>
         /// Encapsulates the storage and processing of individual cells. 
         /// Due to the cells being stored as a single dimensional array, a new CellGrid must be 
         /// created whenever the grid size is changed. 
@@ -96,7 +123,7 @@
             /// <summary>
             /// Density of bombs.
             /// </summary>
-            public float bombDensity { get; private set; }
+            public float bombDensity { get; set; }
             /// <summary>
             /// Array holding the Cell objects that make up the grid
             /// </summary>
@@ -314,7 +341,9 @@
                 }
                 return output;
             }
+
         }
+
     }
 
 }
