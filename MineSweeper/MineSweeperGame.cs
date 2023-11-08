@@ -129,6 +129,17 @@
         }
 
         /// <summary>
+        /// Converts an (x,y) value to the index of the cell at that position, or OOB const if the (x,y) value is not valid.
+        /// </summary>
+        /// <param name="x">The x value to be converted. Out of bounds values are caught and return an error.</param>
+        /// <param name="y">The x value to be converted. Out of bounds values are caught and return an error.</param>
+        /// <returns>The index of the cell at this x,y location, otherwise -1 as an error value.</returns>
+        public int XYToIndex(int x, int y)
+        {
+            return cellGrid.XYToIndex(x, y);
+        }
+
+        /// <summary>
         /// Encapsulates the storage and processing of individual cells. 
         /// Due to the cells being stored as a single dimensional array, a new CellGrid must be 
         /// created whenever the grid size is changed. 

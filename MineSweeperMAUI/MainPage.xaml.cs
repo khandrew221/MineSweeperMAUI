@@ -12,11 +12,11 @@ namespace MineSweeperMAUI
         {
             InitializeComponent();
 
-            // Make the game. TEMPORARY, NEEDS CONTROLLER
-            MineSweeperGame game = new MineSweeperGame(20, 20);
+            // Make the controller. This encapsulates interface with the game code.
+            MAUIController controller = new MAUIController();
 
             // Make the view's grid of buttons
-            MakeButtonGrid(20, 20, 30);
+            MakeButtonGrid(controller, 50);
 
             //and add it to the view
             VerticalStackLayout lay = (VerticalStackLayout)FindByName("grid1");
@@ -28,12 +28,13 @@ namespace MineSweeperMAUI
 /// <summary>
         /// Creates the interactive button grid that forms the main view of and method of with the game field.
         /// </summary>
-        /// <param name="width">int, >0 (work on better constraints/recommended values later)</param>
-        /// <param name="height">int, >0 (work on better constraints/recommended values later)</param>
+        /// <param name="controller"></param>
         /// <param name="buttonSize">int, >0 (work on better constraints/recommended values later)</param>
-        private void MakeButtonGrid(int width, int height, int buttonSize)
+        private void MakeButtonGrid(MAUIController controller, int buttonSize)
         {
             grid = new Grid();
+            int width = controller.GameWidth();
+            int height = controller.GameHeight();
 
             for (int i = 0; i < width; i++)
             {
@@ -45,14 +46,14 @@ namespace MineSweeperMAUI
                 grid.AddRowDefinition(new RowDefinition { Height = new GridLength(buttonSize) });
             }
 
-            for (int i = 0; i < width; i++)
+            for (int x = 0; x < width; x++)
             {
-                for (int j = 0; j < height; j++)
+                for (int y = 0; y < height; y++)
                 {
-                    GridButton btn = new GridButton(j * width + i);
-                    btn.Text = "?";
+                    GridButton btn = new GridButton(x, y);
+                    btn.Text = controller.XYToIndex(x, y).ToString();
                     btn.IsEnabled = true;
-                    grid.Add(btn, i, j);
+                    grid.Add(btn, x, y);
                 }
             }
         }
@@ -63,9 +64,16 @@ namespace MineSweeperMAUI
     /// </summary>
     class GridButton : Button
     {
-        int cellNum;
+        /// <summary>
+        /// X position of the button in the button grid
+        /// </summary>
+        int x;
+        /// <summary>
+        /// Y position of the button in the button grid
+        /// </summary>
+        int y;
 
-        public GridButton(int cellnum)
+        public GridButton(int x, int y)
         {
             //Sets the default style for GridButton objects.
             // !!! Figure out how to do with styles.xaml !!! 
@@ -74,7 +82,8 @@ namespace MineSweeperMAUI
             BorderColor = Colors.Black;
             CornerRadius = 0;
             Clicked += new System.EventHandler(GridButtonClicked);
-            this.cellNum = cellnum;
+            this.x = x;
+            this.y = y;
         }
 
         private void GridButtonClicked(object sender, EventArgs e)

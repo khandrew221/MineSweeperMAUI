@@ -233,7 +233,6 @@ namespace MineSweeperTests
             {
                 Assert.AreEqual(game.CellState(i), MineSweeperGame.HIDDEN);
             }
-
         } 
     }
 }
