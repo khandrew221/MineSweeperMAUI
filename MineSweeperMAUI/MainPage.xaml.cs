@@ -51,7 +51,7 @@ namespace MineSweeperMAUI
                 for (int y = 0; y < height; y++)
                 {
                     GridButton btn = new GridButton(x, y);
-                    btn.Text = controller.XYToIndex(x, y).ToString();
+                    btn.Text = controller.CellState(x, y).ToString();
                     btn.IsEnabled = true;
                     grid.Add(btn, x, y);
                 }

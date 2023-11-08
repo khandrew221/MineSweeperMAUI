@@ -53,5 +53,21 @@ namespace MineSweeperMAUI
             return game.XYToIndex(x, y);
         }
 
+        /// <summary>
+        /// Returns an int representing the current state of the given cell.
+        /// MineSweeperGame.HIDDEN const represents hidden cells 
+        /// Revealed non-bomb cells are represented by their number of bomb neighbours (0-8).
+        /// MineSweeperGame.BOMB const represents a revealed bomb. 
+        /// MineSweeperGame.OOB const represents an out of bounds cell index
+        /// See MineSweeperGame
+        /// </summary>
+        /// <param name="x">the x position of the cell</param>
+        /// <param name="y">the y position of the cell</param>
+        /// <returns>An int representing the current state of the given cell.</returns>
+        public int CellState(int x, int y)
+        {
+            return game.CellState(game.XYToIndex(x,y));
+        }
+
     }
 }
