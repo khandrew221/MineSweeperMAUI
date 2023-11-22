@@ -17,11 +17,31 @@ namespace MineSweeperMAUI
         /// Holds the game class instance.
         /// </summary>
         private static MineSweeperGame game;
+        /// <summary>
+        /// Bomb state tag
+        /// </summary>
+        public const int BOMB = MineSweeperGame.BOMB;
+        /// <summary>
+        /// Hidden state tag
+        /// </summary>
+        public const int HIDDEN = MineSweeperGame.HIDDEN;
+        /// <summary>
+        /// Out of bounds state tag
+        /// </summary>
+        public const int OOB = MineSweeperGame.OOB;
 
 
         public MAUIController()
         {
             game = new MineSweeperGame(20, 10);
+        }
+
+        /// <summary>
+        /// Begins a new game with the current settings.
+        /// </summary>
+        public void BeginGame()
+        {
+            game.SetupGame();
         }
 
         /// <summary>
@@ -67,6 +87,17 @@ namespace MineSweeperMAUI
         public int CellState(int x, int y)
         {
             return game.CellState(game.XYToIndex(x,y));
+        }
+
+        /// <summary>
+        /// Sends a request to reveal the cell at the given location. If a hidden cell is found at that location, it is revealed. Does nothing if the location is not within the grid or the cell at that location is already revealed.
+        /// If the cell is revealed and has no bomb neighbours, it reveals all adjacent cells. 
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        public void RevealCell(int x, int y)
+        {
+            game.RevealCell(x, y);
         }
 
     }

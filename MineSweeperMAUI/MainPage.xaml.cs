@@ -5,7 +5,6 @@ namespace MineSweeperMAUI
     public partial class MainPage : ContentPage
     {
         //Variables required by the view
-        int count = 0;
         Grid grid = new Grid();
 
         public MainPage()
@@ -14,6 +13,10 @@ namespace MineSweeperMAUI
 
             // Make the controller. This encapsulates interface with the game code.
             MAUIController controller = new MAUIController();
+
+            //sets up the initial game
+            controller.BeginGame();
+
 
             // Make the view's grid of buttons
             MakeButtonGrid(controller, 50);
@@ -25,7 +28,7 @@ namespace MineSweeperMAUI
         }
 
        
-/// <summary>
+        /// <summary>
         /// Creates the interactive button grid that forms the main view of and method of with the game field.
         /// </summary>
         /// <param name="controller"></param>
@@ -50,7 +53,7 @@ namespace MineSweeperMAUI
             {
                 for (int y = 0; y < height; y++)
                 {
-                    GridButton btn = new GridButton(x, y);
+                    GridButton btn = new GridButton(x, y, controller);
                     btn.Text = controller.CellState(x, y).ToString();
                     btn.IsEnabled = true;
                     grid.Add(btn, x, y);
@@ -67,13 +70,17 @@ namespace MineSweeperMAUI
         /// <summary>
         /// X position of the button in the button grid
         /// </summary>
-        int x;
+        public int x { get; private set; }
         /// <summary>
         /// Y position of the button in the button grid
         /// </summary>
-        int y;
+        public int y { get; private set; }
+        /// <summary>
+        /// Link to the game controller
+        /// </summary>
+        public MAUIController controller { get; private set; }
 
-        public GridButton(int x, int y)
+        public GridButton(int x, int y, MAUIController controller)
         {
             //Sets the default style for GridButton objects.
             // !!! Figure out how to do with styles.xaml !!! 
@@ -84,11 +91,25 @@ namespace MineSweeperMAUI
             Clicked += new System.EventHandler(GridButtonClicked);
             this.x = x;
             this.y = y;
+            this.controller = controller;
         }
 
         private void GridButtonClicked(object sender, EventArgs e)
         {
-            // code goes here
+            controller.RevealCell(x, y);
+
+            //relabel all grid squares, since multiple ones may be effected
+            Grid g = this.Parent as Grid;
+            foreach (GridButton btn in g)
+            {
+                int state = controller.CellState(btn.x, btn.y);
+                btn.Text = state.ToString();
+                //disable butoon for revealed cells
+                if (state != MAUIController.HIDDEN)
+                {
+                    btn.IsEnabled = false;
+                }
+            }
         }
     };
 }

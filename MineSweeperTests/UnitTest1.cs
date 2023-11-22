@@ -179,7 +179,7 @@ namespace MineSweeperTests
         public void TestBombDistribution(int width, int height)
         {
             MineSweeperGame game = new MineSweeperGame(width, height);
-            float defaultDensity = 0.3f;
+            float defaultDensity = MineSweeperGame.DENSITY_DEFAULT;
 
             ///test setting density values (0 to 0.5 exclusive expected)
             Assert.IsFalse(game.SetBombDensity(0));
@@ -206,7 +206,7 @@ namespace MineSweeperTests
             Assert.IsFalse(game.SetBombDensity(-1));
             Assert.IsTrue(game.BombDensity() == 0.4f);
 
-            float testDensity = 0.2f;
+            float testDensity = 0.3f;
 
             Assert.IsTrue(game.SetBombDensity(testDensity));
 
@@ -233,6 +233,19 @@ namespace MineSweeperTests
             {
                 Assert.AreEqual(game.CellState(i), MineSweeperGame.HIDDEN);
             }
+
+            //test reveal random cell on fresh board 20 times
+            for (int i = 0; i < 20; i++)
+            {
+                game.SetupGame();
+                Random r = new Random();
+                int rX = r.Next(0, width);
+                int rY = r.Next(0, height);
+                game.RevealCell(rX, rY);
+                Assert.AreNotEqual(game.CellState(game.XYToIndex(rX, rY)), MineSweeperGame.HIDDEN);
+                Assert.AreNotEqual(game.CellState(game.XYToIndex(rX, rY)), MineSweeperGame.OOB);
+            }
         } 
+
     }
 }

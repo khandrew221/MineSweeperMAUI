@@ -12,6 +12,8 @@
         public const int HIDDEN = -1;
         public const int OOB = -3;
 
+        public const float DENSITY_DEFAULT = 0.2f;
+
         /// <summary>
         /// Handles the grid of cells that make up the game
         /// </summary>
@@ -140,6 +142,17 @@
         }
 
         /// <summary>
+        /// Reveals the given cell. Does nothing if the location is not within the grid, or if the given cell is already revealed.
+        /// If the cell is revealed and has no bomb neighbours, it reveals all adjacent cells. 
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        public void RevealCell(int x, int y)
+        {
+            cellGrid.RevealCell(x, y);
+        }
+
+        /// <summary>
         /// Encapsulates the storage and processing of individual cells. 
         /// Due to the cells being stored as a single dimensional array, a new CellGrid must be 
         /// created whenever the grid size is changed. 
@@ -219,6 +232,27 @@
                     }
                     return HIDDEN;
                 } 
+
+                /// <summary>
+                /// Reveals the cell if it is hidden. Does nothing if the cell is not hidden.
+                /// </summary>
+                public void Reveal()
+                {
+                    if (isHidden)
+                    {
+                        isHidden = false;
+
+                        //reveal all neighbouring cells. This works recursively to reveal areas with no bombs.
+                        if (State() == 0)
+                        {
+                            foreach (Cell cell in neighbours)
+                            {
+                                cell.Reveal();
+                            }
+                        }
+
+                    }
+                }
             }
 
 
@@ -236,7 +270,7 @@
                 //set width and height
                 WIDTH = width;
                 HEIGHT = height;
-                bombDensity = 0.3f;
+                bombDensity = DENSITY_DEFAULT;
                 cells = new Cell[WIDTH * HEIGHT];
 
                 //create the array of cells
@@ -424,6 +458,21 @@
 
                 }
                 return output;
+            }
+
+            /// <summary>
+            /// Reveals the cell at the given location if the location is the grid and the cell is hidden. Does nothing if the location is not in the grid or the given cell is not hidden.
+            /// If the cell is revealed and has no bomb neighbours, it reveals all adjacent cells. 
+            /// </summary>
+            /// <param name="x"></param>
+            /// <param name="y"></param>
+            public void RevealCell(int x, int y)
+            {
+                if (InGrid(x, y))
+                {
+                    int i = XYToIndex(x, y);
+                    cells[i].Reveal();
+                }
             }
 
         }
