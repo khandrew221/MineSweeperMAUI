@@ -54,8 +54,7 @@ namespace MineSweeperMAUI
                 for (int y = 0; y < height; y++)
                 {
                     GridButton btn = new GridButton(x, y, controller);
-                    btn.Text = controller.CellState(x, y).ToString();
-                    btn.IsEnabled = true;
+                    btn.SetButton();
                     grid.Add(btn, x, y);
                 }
             }
@@ -98,18 +97,38 @@ namespace MineSweeperMAUI
         {
             controller.RevealCell(x, y);
 
-            //relabel all grid squares, since multiple ones may be effected
+            //reset all grid squares, since multiple cells may be effected
             Grid g = this.Parent as Grid;
             foreach (GridButton btn in g)
             {
-                int state = controller.CellState(btn.x, btn.y);
-                btn.Text = state.ToString();
-                //disable butoon for revealed cells
-                if (state != MAUIController.HIDDEN)
-                {
-                    btn.IsEnabled = false;
-                }
+                btn.SetButton();
             }
         }
+
+        //Sets the properties of the cell based on its model state
+        public void SetButton()
+        {
+            int state = controller.CellState(x, y);
+            this.Text = CellText(state);
+
+            //disable button for revealed cells
+            IsEnabled = state == MAUIController.HIDDEN;
+        }
+
+        //Translates the model cell state to display cell text 
+        private String CellText(int s)
+        {
+            switch(s) {
+                case MAUIController.BOMB:
+                    return "!";
+                case MAUIController.OOB:
+                    return "ERR";
+                case MAUIController.HIDDEN:
+                    return "";
+                default:
+                    return s.ToString();    
+            }
+        }
+
     };
 }
