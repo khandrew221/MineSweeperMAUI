@@ -82,11 +82,11 @@ namespace MineSweeperMAUI
         public GridButton(int x, int y, MAUIController controller)
         {
             //Sets the default style for GridButton objects.
-            // !!! Figure out how to do with styles.xaml !!! 
-            VerticalOptions = LayoutOptions.Fill;
-            HorizontalOptions = LayoutOptions.Fill;
-            BorderColor = Colors.Black;
-            CornerRadius = 0;
+            // style found in resource/styles/styles.xaml
+            // style should handle basic enabled/disabled appearance changes 
+            if (App.Current.Resources.TryGetValue("GridButtonStyle", out object style))
+                Style = (Style)style;
+
             Clicked += new System.EventHandler(GridButtonClicked);
             this.x = x;
             this.y = y;
@@ -105,17 +105,23 @@ namespace MineSweeperMAUI
             }
         }
 
-        //Sets the properties of the cell based on its model state
+        /// <summary>
+        /// Sets the properties of the cell based on its model state
+        /// </summary>
         public void SetButton()
         {
             int state = controller.CellState(x, y);
             this.Text = CellText(state);
+            if (state == MAUIController.BOMB)
+                this.BackgroundColor = new Color(255, 0, 0);
 
             //disable button for revealed cells
             IsEnabled = state == MAUIController.HIDDEN;
         }
 
-        //Translates the model cell state to display cell text 
+        /// <summary>
+        /// Translates the model cell state to display cell text 
+        /// </summary>
         private String CellText(int s)
         {
             switch(s) {
