@@ -151,6 +151,8 @@ namespace MineSweeperMAUI
                     return "ERR";
                 case MAUIController.HIDDEN:
                     return "";
+                case 0:
+                    return "";
                 default:
                     return s.ToString();    
             }
