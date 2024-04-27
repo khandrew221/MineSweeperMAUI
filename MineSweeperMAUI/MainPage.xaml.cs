@@ -4,6 +4,8 @@ namespace MineSweeperMAUI
 {
     public partial class MainPage : ContentPage
     {
+
+
         //Variables required by the view
         Grid grid = new Grid();
 
@@ -67,6 +69,20 @@ namespace MineSweeperMAUI
     class GridButton : Button
     {
         /// <summary>
+        /// Text colours for the numbers
+        /// </summary>
+        private static List<Color> NumberColors = new List<Color>
+        { new Color(50,50,50), //dark grey 0
+          new Color(0,0,100), //dark blue 1
+          new Color(0,0,200), //bright blue 2
+          new Color(0,150,150), //dark cyan 3
+          new Color(0,200,0), //green 4
+          new Color(100,150,0), //yellow-green 5
+          new Color(150,150,0), //bright blue 6
+          new Color(255,100,0), //orange 7
+          new Color(150,0,0) //dull red 8
+        }; 
+        /// <summary>
         /// X position of the button in the button grid
         /// </summary>
         public int x { get; private set; }
@@ -112,8 +128,12 @@ namespace MineSweeperMAUI
         {
             int state = controller.CellState(x, y);
             this.Text = CellText(state);
+
             if (state == MAUIController.BOMB)
-                this.BackgroundColor = new Color(255, 0, 0);
+                BackgroundColor = new Color(255, 0, 0);
+
+            if (state >= 0 && state < NumberColors.Count)
+                TextColor = NumberColors[state];
 
             //disable button for revealed cells
             IsEnabled = state == MAUIController.HIDDEN;
