@@ -21,22 +21,35 @@
         /// <summary>
         /// Reports on the state of the game: 0 for active, -1 for loss state, 1 for a win state 
         /// </summary>
-        public int GameState { get; private set; }
+        public int gameState { get; private set; }
 
         /// <summary>
-        /// Class constructor, initialising a grid of the specified width and height. Grid size can
-        /// be changed later (!!!not currently). Values expected to be >0.
+        /// Class constructor, initialising a grid of the specified width, height, and bomb density. Parameters can be changed later. 
+        /// Values expected to be >0.
         /// </summary>
-        public MineSweeperGame(int width, int height)
+        public MineSweeperGame(int width, int height, float density)
         {
-            cellGrid = new CellGrid(width, height);
+            cellGrid = new CellGrid(width, height, density);
         }
 
         /// <summary>
-        /// Sets up the game with current grid size and bomb density.
+        /// Sets up a new game with current grid size and bomb density.
         /// </summary>
-        public void SetupGame()
+        public void NewGame()
         {
+            cellGrid.SetGrid();
+        }
+
+        /// <summary>
+        /// Sets up a new game with the given parameters
+        /// !!! define some argument constraints
+        /// </summary>
+        /// <param name="x"> grid width</param>
+        /// <param name="y"> grid height</param>
+        /// <param name="b"> bomb density</param>
+        public void NewGame(int x, int y, float b)
+        {
+            cellGrid = new CellGrid(x, y, b);
             cellGrid.SetGrid();
         }
 
@@ -265,12 +278,12 @@
             /// </summary>
             /// <param name="width">The grid width. Precondition: >0.</param>
             /// <param name="height">The grid height. Precondition: >0.</param>
-            public CellGrid(int width, int height)
+            public CellGrid(int width, int height, float density)
             {
                 //set width and height
                 WIDTH = width;
                 HEIGHT = height;
-                bombDensity = DENSITY_DEFAULT;
+                bombDensity = density;
                 cells = new Cell[WIDTH * HEIGHT];
 
                 //create the array of cells
@@ -314,7 +327,7 @@
             }
 
             /// <summary>
-            /// Returns an int representing the current state of each cell in the game grid. 
+            /// Returns an int representing the current state of a cell in the game grid. 
             /// HIDDEN const represents hidden cells 
             /// Revealed non-bomb cells are represented by their number of bomb neighbours (0-8).
             /// BOMB const represents a revealed bomb. 
@@ -462,7 +475,7 @@
 
             /// <summary>
             /// Reveals the cell at the given location if the location is the grid and the cell is hidden. Does nothing if the location is not in the grid or the given cell is not hidden.
-            /// If the cell is revealed and has no bomb neighbours, it reveals all adjacent cells. 
+            /// If the cell is revealed and has no bomb neighbours, it recursively reveals all adjacent cells. 
             /// </summary>
             /// <param name="x"></param>
             /// <param name="y"></param>

@@ -1,10 +1,13 @@
 ﻿using MineSweeper;
+using System.Xml;
 
 namespace MineSweeperMAUI
 {
     public partial class MainPage : ContentPage
     {
-
+        const int DefaultXSize = 10;
+        const int DefaultYSize = 10;
+        const int DefaultBombDensity = 20;
 
         //Variables required by the view
         Grid grid = new Grid();
@@ -13,12 +16,19 @@ namespace MineSweeperMAUI
         {
             InitializeComponent();
 
+            //initialise setting sliders. Has to be done here since xaml Value does not work
+            Slider s = (Slider)FindByName("XSlider");
+            s.Value = DefaultXSize;
+            s = (Slider)FindByName("YSlider");
+            s.Value = DefaultYSize;
+            s = (Slider)FindByName("BombDensity");
+            s.Value = DefaultBombDensity;
+
             // Make the controller. This encapsulates interface with the game code.
             MAUIController controller = new MAUIController();
 
-            //sets up the initial game
-            controller.BeginGame();
-
+            //sets up the initial game. Bomb density must be converted from % to decimal
+            controller.BeginGame(DefaultXSize, DefaultYSize, DefaultBombDensity/100.0f);
 
             // Make the view's grid of buttons
             MakeButtonGrid(controller, 50);
@@ -29,7 +39,36 @@ namespace MineSweeperMAUI
 
         }
 
-       
+        /// <summary>
+        /// Controls slider code
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnSliderValueChanged(object sender, EventArgs e)
+        {
+            Slider s = (Slider)sender;
+            String id = s.StyleId;
+
+            switch (id)
+            {
+                case "BombDensity":
+                    Label l = (Label)FindByName("BombDensityValue");
+                    l.Text = String.Format("{0}%", (int)s.Value);
+                    break;
+                case "XSlider":
+                    l = (Label)FindByName("XSliderValue");
+                    l.Text = String.Format("{0}", (int)s.Value);
+                    break;
+                case "YSlider":
+                    l = (Label)FindByName("YSliderValue");
+                    l.Text = String.Format("{0}", (int)s.Value);
+                    break;
+            }
+
+        }
+
+
+
         /// <summary>
         /// Creates the interactive button grid that forms the main view of and method of with the game field.
         /// </summary>

@@ -58,7 +58,7 @@ namespace MineSweeperTests
         public void TestSizeValues(int width, int height)
         {
             //extremely basic test to check size of the grid is correct for given values
-            MineSweeperGame game = new MineSweeperGame(width, height);
+            MineSweeperGame game = new MineSweeperGame(width, height, 0);
 
             Assert.AreEqual(width*height, game.NumberOfCells());
             Assert.AreEqual(height, game.Height());
@@ -68,7 +68,7 @@ namespace MineSweeperTests
         public void TestNeighbourAssignment()
         {
             //tests nieghbour assignment on a 5x5 grid (minimum size to cover all possible neighbour types is 3x3).
-            MineSweeperGame game = new MineSweeperGame(5, 5);
+            MineSweeperGame game = new MineSweeperGame(5, 5, 0);
 
             //Corner tests
             HashSet<int> values = game.NeighboursOf(0, 0);
@@ -178,7 +178,7 @@ namespace MineSweeperTests
 
         public void TestBombDistribution(int width, int height)
         {
-            MineSweeperGame game = new MineSweeperGame(width, height);
+            MineSweeperGame game = new MineSweeperGame(width, height, MineSweeperGame.DENSITY_DEFAULT);
             float defaultDensity = MineSweeperGame.DENSITY_DEFAULT;
 
             ///test setting density values (0 to 0.5 exclusive expected)
@@ -210,15 +210,15 @@ namespace MineSweeperTests
 
             Assert.IsTrue(game.SetBombDensity(testDensity));
 
-            game.SetupGame();
+            game.NewGame();
 
             Assert.AreEqual((int)Math.Floor(width * height * testDensity), game.AllBombs().Count);
         }
 
         public void TestCellStateReporting(int width, int height)
         {
-            MineSweeperGame game = new MineSweeperGame(width, height);
-            game.SetupGame();
+            MineSweeperGame game = new MineSweeperGame(width, height, 0.2f);
+            game.NewGame();
 
             //test OOB index values
             Assert.AreNotEqual(game.CellState(0), MineSweeperGame.OOB);
@@ -237,7 +237,7 @@ namespace MineSweeperTests
             //test reveal random cell on fresh board 20 times
             for (int i = 0; i < 20; i++)
             {
-                game.SetupGame();
+                game.NewGame();
                 Random r = new Random();
                 int rX = r.Next(0, width);
                 int rY = r.Next(0, height);

@@ -10,7 +10,75 @@
             VerticalOptions="Center"
             x:Name="grid1">
             <!-- x:name added so the grid can be found by name and changed at runtime -->
- 
+
+            <Frame 
+                x:Name="SettingsFrame"
+                BorderColor="Black"
+                MaximumWidthRequest="400"
+                HasShadow="True">
+                <VerticalStackLayout x:Name="SettingsLayout">
+                    <Label Text="SETTINGS"/>
+                    <HorizontalStackLayout>
+                        <Label x:Name="BombDensityValue"
+                            Text=""
+                            HorizontalOptions="Center"
+                            VerticalOptions="Center" 
+                            MinimumWidthRequest="33"/>
+                        <Label x:Name="BombDensityLabel"
+                            Text="Bombs"
+                            HorizontalOptions="Center"
+                            VerticalOptions="Center" 
+                            MinimumWidthRequest="100"/>
+                        <Slider x:Name="BombDensity" 
+                            MinimumWidthRequest="150"
+                            Maximum="50"
+                            Minimum="10"
+                            ValueChanged="OnSliderValueChanged" />
+                    </HorizontalStackLayout>
+                    <VerticalStackLayout x:Name="XYSlidersMain">
+                        <HorizontalStackLayout>
+                            <Label x:Name="XSliderValue"
+                               Text=""
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center" 
+                               MinimumWidthRequest="33"/>
+                            <Label x:Name="XSliderLabel"
+                               Text="Width"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center" 
+                               MinimumWidthRequest="100"/>
+                            <Slider x:Name="XSlider" 
+                               MinimumWidthRequest="150"
+                               Maximum="50"
+                               Minimum="5"
+                               ValueChanged="OnSliderValueChanged" />
+                        </HorizontalStackLayout>
+                        <HorizontalStackLayout>
+                            <Label x:Name="YSliderValue"
+                               Text=""
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center" 
+                               MinimumWidthRequest="33"/>
+                            <Label x:Name="YSliderLabel"
+                               Text="Height"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center" 
+                               MinimumWidthRequest="100"/>
+                            <Slider x:Name="YSlider" 
+                               MinimumWidthRequest="150"
+                               Maximum="50"
+                               Minimum="5"
+                               ValueChanged="OnSliderValueChanged" />
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Frame>
+                
+
+
+            <Button Text="New Game" />
+            <Label Text="Game State" />
+
         </VerticalStackLayout>
     </ScrollView>
 
