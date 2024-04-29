@@ -8,6 +8,8 @@ namespace MineSweeperMAUI
         const int DefaultYSize = 10;
         const int DefaultBombDensity = 20;
 
+        int CellSize = 50;
+
         //Variables required by the view
         Grid grid = new Grid();
         VerticalStackLayout gridLayout;
@@ -32,7 +34,7 @@ namespace MineSweeperMAUI
             controller.BeginGame(DefaultXSize, DefaultYSize, DefaultBombDensity/100.0f);
 
             // Make the view's grid of buttons
-            MakeButtonGrid(controller, 50);
+            MakeButtonGrid(controller, CellSize);
 
             //and add it to the view
             VerticalStackLayout lay = (VerticalStackLayout)FindByName("grid1");
@@ -86,7 +88,7 @@ namespace MineSweeperMAUI
 
             //reset the grid. Since the size may change the grid is removed, remade, and replaced in the layout. 
             gridLayout.Remove(grid);
-            MakeButtonGrid(controller, 50);
+            MakeButtonGrid(controller, CellSize);
             gridLayout.Add(grid);
         }
 
