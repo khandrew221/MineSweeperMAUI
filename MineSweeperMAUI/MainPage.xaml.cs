@@ -37,8 +37,7 @@ namespace MineSweeperMAUI
             MakeButtonGrid(controller, CellSize);
 
             //and add it to the view
-            VerticalStackLayout lay = (VerticalStackLayout)FindByName("grid1");
-            lay.Add(grid);
+            gridLayout.Add(grid);
 
         }
 
