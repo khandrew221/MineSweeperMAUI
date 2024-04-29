@@ -1,5 +1,4 @@
-﻿using MineSweeper;
-using System.Xml;
+﻿using System.Xml;
 
 namespace MineSweeperMAUI
 {
@@ -11,10 +10,15 @@ namespace MineSweeperMAUI
 
         //Variables required by the view
         Grid grid = new Grid();
+        VerticalStackLayout gridLayout;
+        MAUIController controller = new MAUIController(); //This encapsulates interface with the game code.
 
         public MainPage()
         {
             InitializeComponent();
+
+            //store the location of the grid so it can be manipulated by code later
+            gridLayout = (VerticalStackLayout)FindByName("grid1");
 
             //initialise setting sliders. Has to be done here since xaml Value does not work
             Slider s = (Slider)FindByName("XSlider");
@@ -23,9 +27,6 @@ namespace MineSweeperMAUI
             s.Value = DefaultYSize;
             s = (Slider)FindByName("BombDensity");
             s.Value = DefaultBombDensity;
-
-            // Make the controller. This encapsulates interface with the game code.
-            MAUIController controller = new MAUIController();
 
             //sets up the initial game. Bomb density must be converted from % to decimal
             controller.BeginGame(DefaultXSize, DefaultYSize, DefaultBombDensity/100.0f);
@@ -67,6 +68,27 @@ namespace MineSweeperMAUI
 
         }
 
+        /// <summary>
+        /// Begins a new game on button press
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void NewGameButtonPressed(object sender, EventArgs e)
+        {
+            //resart the backend game component with the current settings
+            Slider s = (Slider)FindByName("BombDensity");
+            int b = (int)s.Value;
+            s = (Slider)FindByName("XSlider");
+            int x = (int)s.Value;
+            s = (Slider)FindByName("YSlider");
+            int y = (int)s.Value;
+            controller.BeginGame(x, y, b / 100.0f);
+
+            //reset the grid. Since the size may change the grid is removed, remade, and replaced in the layout. 
+            gridLayout.Remove(grid);
+            MakeButtonGrid(controller, 50);
+            gridLayout.Add(grid);
+        }
 
 
         /// <summary>

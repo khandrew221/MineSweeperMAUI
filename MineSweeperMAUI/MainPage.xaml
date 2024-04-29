@@ -73,10 +73,14 @@
                     </VerticalStackLayout>
                 </VerticalStackLayout>
             </Frame>
-                
 
+            <Frame>
+                <Button Text="New Game" 
+                    Pressed="NewGameButtonPressed"/>
+            </Frame>
 
-            <Button Text="New Game" />
+            
+            
             <Label Text="Game State" />
 
         </VerticalStackLayout>
