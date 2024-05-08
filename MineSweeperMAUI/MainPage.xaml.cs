@@ -7,6 +7,7 @@ namespace MineSweeperMAUI
         const int DefaultXSize = 10;
         const int DefaultYSize = 10;
         const int DefaultBombDensity = 20;
+        const int DefaultLives = 3;
 
         int CellSize = 50;
 
@@ -31,7 +32,8 @@ namespace MineSweeperMAUI
             s.Value = DefaultBombDensity;
 
             //sets up the initial game. Bomb density must be converted from % to decimal
-            controller.BeginGame(DefaultXSize, DefaultYSize, DefaultBombDensity/100.0f);
+            controller.BeginGame(DefaultXSize, DefaultYSize, DefaultBombDensity/100.0f, DefaultLives);
+            UpdateGameSummaryText();
 
             // Make the view's grid of buttons
             MakeButtonGrid(controller, CellSize);
@@ -39,6 +41,15 @@ namespace MineSweeperMAUI
             //and add it to the view
             gridLayout.Add(grid);
 
+        }
+
+        /// <summary>
+        /// Updates the game summary label text
+        /// </summary>
+        public void UpdateGameSummaryText()
+        {
+            Label l = (Label)FindByName("GameSummary");
+            l.Text = String.Format("Lives left {0}, Bombs Triggered {1}", controller.LivesRemaining(), controller.BombsTriggered());
         }
 
         /// <summary>
@@ -83,12 +94,14 @@ namespace MineSweeperMAUI
             int x = (int)s.Value;
             s = (Slider)FindByName("YSlider");
             int y = (int)s.Value;
-            controller.BeginGame(x, y, b / 100.0f);
+            controller.BeginGame(x, y, b / 100.0f, DefaultLives);
 
             //reset the grid. Since the size may change the grid is removed, remade, and replaced in the layout. 
             gridLayout.Remove(grid);
             MakeButtonGrid(controller, CellSize);
             gridLayout.Add(grid);
+
+            UpdateGameSummaryText();
         }
 
 
@@ -181,6 +194,9 @@ namespace MineSweeperMAUI
             {
                 btn.SetButton();
             }
+
+            Label l = (Label)FindByName("GameSummary");
+            l.Text = String.Format("Lives left {0}, Bombs Triggered {1}", controller.LivesRemaining(), controller.BombsTriggered());
         }
 
         /// <summary>

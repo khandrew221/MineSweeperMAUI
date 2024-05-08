@@ -58,7 +58,7 @@ namespace MineSweeperTests
         public void TestSizeValues(int width, int height)
         {
             //extremely basic test to check size of the grid is correct for given values
-            MineSweeperGame game = new MineSweeperGame(width, height, 0);
+            MineSweeperGame game = new MineSweeperGame(width, height, 0, 1 );
 
             Assert.AreEqual(width*height, game.NumberOfCells());
             Assert.AreEqual(height, game.Height());
@@ -68,7 +68,7 @@ namespace MineSweeperTests
         public void TestNeighbourAssignment()
         {
             //tests nieghbour assignment on a 5x5 grid (minimum size to cover all possible neighbour types is 3x3).
-            MineSweeperGame game = new MineSweeperGame(5, 5, 0);
+            MineSweeperGame game = new MineSweeperGame(5, 5, 0, 1);
 
             //Corner tests
             HashSet<int> values = game.NeighboursOf(0, 0);
@@ -178,7 +178,7 @@ namespace MineSweeperTests
 
         public void TestBombDistribution(int width, int height)
         {
-            MineSweeperGame game = new MineSweeperGame(width, height, MineSweeperGame.DENSITY_DEFAULT);
+            MineSweeperGame game = new MineSweeperGame(width, height, MineSweeperGame.DENSITY_DEFAULT, 1);
             float defaultDensity = MineSweeperGame.DENSITY_DEFAULT;
 
             ///test setting density values (0 to 0.5 exclusive expected)
@@ -217,7 +217,7 @@ namespace MineSweeperTests
 
         public void TestCellStateReporting(int width, int height)
         {
-            MineSweeperGame game = new MineSweeperGame(width, height, 0.2f);
+            MineSweeperGame game = new MineSweeperGame(width, height, 0.2f, 1);
             game.NewGame();
 
             //test OOB index values

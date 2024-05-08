@@ -33,7 +33,7 @@ namespace MineSweeperMAUI
 
         public MAUIController()
         {
-            game = new MineSweeperGame(20, 10, 0.2f);
+            game = new MineSweeperGame(20, 10, 0.2f, 3);
         }
 
         /// <summary>
@@ -47,9 +47,9 @@ namespace MineSweeperMAUI
         /// <summary>
         /// Begins a new game with the given settings.
         /// </summary>
-        public void BeginGame(int x, int y, float b)
+        public void BeginGame(int x, int y, float b, int l)
         {
-            game.NewGame(x, y, b);
+            game.NewGame(x, y, b, l);
         }
 
         /// <summary>
@@ -108,5 +108,22 @@ namespace MineSweeperMAUI
             game.RevealCell(x, y);
         }
 
+        /// <summary>
+        /// Returns the number of lives remaining
+        /// </summary>
+        /// <returns></returns>
+        public int LivesRemaining()
+        {
+            return game.LivesRemaining();
+        }
+
+        /// <summary>
+        /// Returns the number of bombs triggered
+        /// </summary>
+        /// <returns></returns>
+        public int BombsTriggered()
+        {
+            return game.BombsTriggered;
+        }
     }
 }

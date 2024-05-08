@@ -79,9 +79,9 @@
                     Pressed="NewGameButtonPressed"/>
             </Frame>
 
-            
-            
-            <Label Text="Game State" />
+
+
+            <Label x:Name="GameSummary" Text="Game State" />
 
         </VerticalStackLayout>
     </ScrollView>

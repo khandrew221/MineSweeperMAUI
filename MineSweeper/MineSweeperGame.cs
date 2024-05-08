@@ -13,6 +13,7 @@
         public const int OOB = -3;
 
         public const float DENSITY_DEFAULT = 0.2f;
+        public const float LIVES_DEFAULT = 3;
 
         /// <summary>
         /// Handles the grid of cells that make up the game
@@ -21,23 +22,34 @@
         /// <summary>
         /// Reports on the state of the game: 0 for active, -1 for loss state, 1 for a win state 
         /// </summary>
-        public int gameState { get; private set; }
+        public int GameState { get; private set; }
+        /// <summary>
+        /// Tracks the number of bombs triggered
+        /// </summary>
+        public int BombsTriggered { get; private set; }
+        /// <summary>
+        /// Stores the maximum lives for this game
+        /// </summary>
+        public int MaxLives { get; private set; }
 
         /// <summary>
-        /// Class constructor, initialising a grid of the specified width, height, and bomb density. Parameters can be changed later. 
+        /// Class constructor, initialising a grid of the specified width, height, bomb density, and max lives. Parameters can be changed later. 
         /// Values expected to be >0.
         /// </summary>
-        public MineSweeperGame(int width, int height, float density)
+        public MineSweeperGame(int width, int height, float density, int lives)
         {
             cellGrid = new CellGrid(width, height, density);
+            BombsTriggered = 0;
+            MaxLives = lives;
         }
 
         /// <summary>
-        /// Sets up a new game with current grid size and bomb density.
+        /// Sets up a new game with current grid size, bomb density, and lives.
         /// </summary>
         public void NewGame()
         {
             cellGrid.SetGrid();
+            BombsTriggered = 0;
         }
 
         /// <summary>
@@ -47,10 +59,13 @@
         /// <param name="x"> grid width</param>
         /// <param name="y"> grid height</param>
         /// <param name="b"> bomb density</param>
-        public void NewGame(int x, int y, float b)
+        /// <param name="l"> max lives</param>
+        public void NewGame(int x, int y, float b, int l)
         {
             cellGrid = new CellGrid(x, y, b);
             cellGrid.SetGrid();
+            BombsTriggered = 0;
+            MaxLives = l;
         }
 
         /// <summary>
@@ -157,12 +172,25 @@
         /// <summary>
         /// Reveals the given cell. Does nothing if the location is not within the grid, or if the given cell is already revealed.
         /// If the cell is revealed and has no bomb neighbours, it reveals all adjacent cells. 
+        /// If the cell was a bomb, increments BombsTriggered
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
         public void RevealCell(int x, int y)
         {
-            cellGrid.RevealCell(x, y);
+            if (cellGrid.RevealCell(x, y))
+            {
+                BombsTriggered++;
+            }
+        }
+
+        /// <summary>
+        /// Returns the number of lives remaining.
+        /// </summary>
+        /// <returns></returns>
+        public int LivesRemaining() 
+        {
+            return MaxLives - BombsTriggered;
         }
 
         /// <summary>
@@ -248,12 +276,18 @@
 
                 /// <summary>
                 /// Reveals the cell if it is hidden. Does nothing if the cell is not hidden.
+                /// Returns true if the revealed cell was a bomb, otherwise false
                 /// </summary>
-                public void Reveal()
+                public bool Reveal()
                 {
                     if (isHidden)
                     {
                         isHidden = false;
+
+                        if (isBomb)
+                        {
+                            return true;
+                        }
 
                         //reveal all neighbouring cells. This works recursively to reveal areas with no bombs.
                         if (State() == 0)
@@ -265,6 +299,8 @@
                         }
 
                     }
+
+                    return false;
                 }
             }
 
@@ -476,16 +512,19 @@
             /// <summary>
             /// Reveals the cell at the given location if the location is the grid and the cell is hidden. Does nothing if the location is not in the grid or the given cell is not hidden.
             /// If the cell is revealed and has no bomb neighbours, it recursively reveals all adjacent cells. 
+            /// Returns true if the revealed cell was a bomb, otherwise false.
             /// </summary>
             /// <param name="x"></param>
             /// <param name="y"></param>
-            public void RevealCell(int x, int y)
+            public bool RevealCell(int x, int y)
             {
                 if (InGrid(x, y))
                 {
                     int i = XYToIndex(x, y);
-                    cells[i].Reveal();
+                    return cells[i].Reveal();
                 }
+
+                return false;
             }
 
         }
