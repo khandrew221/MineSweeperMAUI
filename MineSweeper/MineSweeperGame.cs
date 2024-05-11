@@ -28,6 +28,10 @@
         /// </summary>
         public int BombsTriggered { get; private set; }
         /// <summary>
+        /// Tracks the number of clear cells revealed
+        /// </summary>
+        public int SafeReveals { get; private set; }
+        /// <summary>
         /// Stores the maximum lives for this game
         /// </summary>
         public int MaxLives { get; private set; }
@@ -40,6 +44,7 @@
         {
             cellGrid = new CellGrid(width, height, density);
             BombsTriggered = 0;
+            GameState = 0;
             MaxLives = lives;
         }
 
@@ -49,7 +54,7 @@
         public void NewGame()
         {
             cellGrid.SetGrid();
-            BombsTriggered = 0;
+            ResetStats();
         }
 
         /// <summary>
@@ -64,8 +69,18 @@
         {
             cellGrid = new CellGrid(x, y, b);
             cellGrid.SetGrid();
-            BombsTriggered = 0;
             MaxLives = l;
+            ResetStats();
+        }
+
+        /// <summary>
+        /// Resets game state, BombsTriggered, and SafeReveals to 0
+        /// </summary>
+        private void ResetStats()
+        {
+            GameState = 0;
+            BombsTriggered = 0;
+            SafeReveals = 0;
         }
 
         /// <summary>
@@ -171,16 +186,44 @@
 
         /// <summary>
         /// Reveals the given cell. Does nothing if the location is not within the grid, or if the given cell is already revealed.
-        /// If the cell is revealed and has no bomb neighbours, it reveals all adjacent cells. 
+        /// If the cell is revealed and has no bomb neighbours, it reveals all adjacent cells, and adds the number revealed to the count of safely revealed cells. 
         /// If the cell was a bomb, increments BombsTriggered
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
         public void RevealCell(int x, int y)
         {
-            if (cellGrid.RevealCell(x, y))
+            int r = cellGrid.RevealCell(x, y);
+
+            if (r == BOMB)
             {
                 BombsTriggered++;
+                UpdateGameState();
+            } else if (r > 0) {
+                SafeReveals += r;
+                UpdateGameState();
+            }
+        }
+
+        /// <summary>
+        /// Updates the game state based on current count of lives, revealed cells, and bombs triggered.
+        /// </summary>
+        public void UpdateGameState()
+        {
+            //game ends in loss if out of lives
+            if (LivesRemaining() < 1)
+            {
+                GameState = -1;
+            }
+            //lives remain and there are no more safe cells to reveal: win state
+            else if (SafeCellsRemaining() == 0)
+            {
+                GameState = 1;
+            }
+            //otherwise, game is still active
+            else
+            {
+                GameState = 0;
             }
         }
 
@@ -191,6 +234,15 @@
         public int LivesRemaining() 
         {
             return MaxLives - BombsTriggered;
+        }
+
+        /// <summary>
+        /// Returns the number of safe cells still hidden.
+        /// </summary>
+        /// <returns></returns>
+        public int SafeCellsRemaining()
+        {
+            return cellGrid.SafeCells() - SafeReveals;
         }
 
         /// <summary>
@@ -276,31 +328,35 @@
 
                 /// <summary>
                 /// Reveals the cell if it is hidden. Does nothing if the cell is not hidden.
-                /// Returns true if the revealed cell was a bomb, otherwise false
+                /// Returns BOMB if the revealed cell was a bomb, otherwise the number of cells revealed
                 /// </summary>
-                public bool Reveal()
+                public int Reveal()
                 {
+                    int numRevealed = 0;
+
                     if (isHidden)
                     {
                         isHidden = false;
 
                         if (isBomb)
                         {
-                            return true;
+                            return BOMB;
                         }
+
+                        numRevealed++;
 
                         //reveal all neighbouring cells. This works recursively to reveal areas with no bombs.
                         if (State() == 0)
                         {
                             foreach (Cell cell in neighbours)
                             {
-                                cell.Reveal();
+                                numRevealed += cell.Reveal();
                             }
                         }
 
                     }
 
-                    return false;
+                    return numRevealed;
                 }
             }
 
@@ -353,7 +409,7 @@
             /// </summary>
             public void SetGrid()
             {
-                HashSet<int> bombs = GenerateBombSet((int)Math.Floor(WIDTH*HEIGHT*bombDensity));
+                HashSet<int> bombs = GenerateBombSet(NumberOfBombs());
 
                 for (int i = 0; i < cells.Length; i++)
                 {
@@ -512,11 +568,11 @@
             /// <summary>
             /// Reveals the cell at the given location if the location is the grid and the cell is hidden. Does nothing if the location is not in the grid or the given cell is not hidden.
             /// If the cell is revealed and has no bomb neighbours, it recursively reveals all adjacent cells. 
-            /// Returns true if the revealed cell was a bomb, otherwise false.
+            /// Returns BOMB if the revealed cell was a bomb, OOB for an out of bounds value, otherwise the number of cells revealed.
             /// </summary>
             /// <param name="x"></param>
             /// <param name="y"></param>
-            public bool RevealCell(int x, int y)
+            public int RevealCell(int x, int y)
             {
                 if (InGrid(x, y))
                 {
@@ -524,7 +580,25 @@
                     return cells[i].Reveal();
                 }
 
-                return false;
+                return OOB;
+            }
+
+            /// <summary>
+            /// Returns the total number of bombs in the grid
+            /// </summary>
+            /// <returns></returns>
+            public int NumberOfBombs()
+            {
+                return (int)Math.Floor(WIDTH * HEIGHT * bombDensity);
+            }
+
+            /// <summary>
+            /// Returns the total number of safe cells in the grid
+            /// </summary>
+            /// <returns></returns>
+            public int SafeCells()
+            {
+                return NumberOfCells() - NumberOfBombs();
             }
 
         }

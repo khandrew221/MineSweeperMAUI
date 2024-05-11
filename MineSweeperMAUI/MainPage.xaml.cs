@@ -196,7 +196,7 @@ namespace MineSweeperMAUI
             }
 
             Label l = (Label)FindByName("GameSummary");
-            l.Text = String.Format("Lives left {0}, Bombs Triggered {1}", controller.LivesRemaining(), controller.BombsTriggered());
+            l.Text = String.Format("Lives left {0}, Bombs Triggered {1}, Safe Cells Found {2}, Game State {3}", controller.LivesRemaining(), controller.BombsTriggered(), controller.SafeReveals(), controller.GameState());
         }
 
         /// <summary>

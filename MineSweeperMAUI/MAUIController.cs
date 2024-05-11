@@ -125,5 +125,24 @@ namespace MineSweeperMAUI
         {
             return game.BombsTriggered;
         }
+
+        /// <summary>
+        /// Returns the number of safe cells revealed
+        /// </summary>
+        /// <returns></returns>
+        public int SafeReveals()
+        {
+            return game.SafeReveals;
+        }
+
+
+        /// <summary>
+        /// Returns 0 for active, -1 for loss, 1 for win
+        /// </summary>
+        /// <returns></returns>
+        public int GameState()
+        {
+            return game.GameState;
+        }
     }
 }
