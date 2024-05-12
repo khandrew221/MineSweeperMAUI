@@ -45,12 +45,6 @@ namespace MineSweeperTests
             TestSizeValues(25, 50);
             TestSizeValues(50, 25);
 
-            //
-            TestNeighbourAssignment();
-
-            TestBombDistribution(5, 5);
-
-
             TestCellStateReporting(10, 15);
 
         }
@@ -76,6 +70,7 @@ namespace MineSweeperTests
         /// MineSweeperGame.NeighboursOf()
         /// CellGrid.GenerateNeighboursSet()
         /// </summary>
+        [TestMethod]
         public void TestNeighbourAssignment()
         {
             //tests nieghbour assignment on a 5x5 grid (minimum size to cover all possible neighbour types is 3x3).
@@ -188,47 +183,68 @@ namespace MineSweeperTests
         }
 
         /// <summary>
+        /// DENSITY_MIN assumed to be >=0 and <= DENSITY_MAX - 0.1
+        /// Tested to 0.0000001 precision; more precision starts to clash with float precision and produce unexpected logic values
+        /// Values DENSITY_MAX + (<)0.00000003f accepted, DENSITY_MAX + 0.0000003f fails to be set as expected
         /// Includes testing for 
         /// MineSweeperGame.SetBombDensity()
+        /// MineSweeperGame.BombDensity()
         /// </summary>
-        public void TestBombDistribution(int width, int height)
+        [TestMethod]
+        public void TestBombDensitySetting()
         {
-            MineSweeperGame game = new MineSweeperGame(width, height, MineSweeperGame.DENSITY_DEFAULT, 1);
-            float defaultDensity = MineSweeperGame.DENSITY_DEFAULT;
+            /// tests on constant values to make sure they are still within bounds 0 to 1 and logically consistent
+            Assert.IsTrue(MineSweeperGame.DENSITY_MIN >= 0);
+            Assert.IsTrue(MineSweeperGame.DENSITY_MAX <= 1);
+            Assert.IsTrue(MineSweeperGame.DENSITY_MIN <= MineSweeperGame.DENSITY_MAX);
+            Assert.IsTrue(MineSweeperGame.DENSITY_DEFAULT >= MineSweeperGame.DENSITY_MIN);
+            Assert.IsTrue(MineSweeperGame.DENSITY_DEFAULT <= MineSweeperGame.DENSITY_MAX);
 
-            ///test setting density values (0 to 0.5 exclusive expected)
-            Assert.IsFalse(game.SetBombDensity(0));
-            Assert.IsTrue(game.BombDensity() == defaultDensity);
+            /// set up game and test density value is default
+            MineSweeperGame game = new MineSweeperGame(10, 10, MineSweeperGame.DENSITY_DEFAULT, 1);
+            Assert.IsTrue(game.BombDensity() == MineSweeperGame.DENSITY_DEFAULT);
 
-            Assert.IsFalse(game.SetBombDensity(0.5f));
-            Assert.IsTrue(game.BombDensity() == defaultDensity);
+            ///test setting density values (DENSITY_MIN to DENSITY_MAX inclusive expected)
+            BombDensitySettingSubTest(MineSweeperGame.DENSITY_MIN, true, game);
+            BombDensitySettingSubTest(MineSweeperGame.DENSITY_MIN - 0.0000001f, false, game);
+            BombDensitySettingSubTest(MineSweeperGame.DENSITY_MIN + 0.0000001f, true, game);
+            BombDensitySettingSubTest(MineSweeperGame.DENSITY_MIN - 0.1f, false, game);
+            BombDensitySettingSubTest(MineSweeperGame.DENSITY_MIN + 0.1f, true, game);
 
-            Assert.IsTrue(game.SetBombDensity(0.000001f));
-            Assert.IsTrue(game.BombDensity() == 0.000001f);
+            BombDensitySettingSubTest(MineSweeperGame.DENSITY_MAX, true, game);
+            BombDensitySettingSubTest(MineSweeperGame.DENSITY_MAX - 0.0000001f, true, game);
+            BombDensitySettingSubTest(MineSweeperGame.DENSITY_MAX + 0.0000001f, false, game);
+            BombDensitySettingSubTest(MineSweeperGame.DENSITY_MAX - 0.1f, true, game);
+            BombDensitySettingSubTest(MineSweeperGame.DENSITY_MAX + 0.1f, false, game);
 
-            Assert.IsTrue(game.SetBombDensity(0.4999999f));
-            Assert.IsTrue(game.BombDensity() == 0.4999999f);
+            BombDensitySettingSubTest(MineSweeperGame.DENSITY_DEFAULT, true, game);
 
-            Assert.IsTrue(game.SetBombDensity(0.1f));
-            Assert.IsTrue(game.BombDensity() == 0.1f);
+            BombDensitySettingSubTest(-1, false, game);
 
-            Assert.IsTrue(game.SetBombDensity(0.4f));
-            Assert.IsTrue(game.BombDensity() == 0.4f);
-
-            Assert.IsFalse(game.SetBombDensity(1));
-            Assert.IsTrue(game.BombDensity() == 0.4f);
-
-            Assert.IsFalse(game.SetBombDensity(-1));
-            Assert.IsTrue(game.BombDensity() == 0.4f);
-
-            float testDensity = 0.3f;
-
-            Assert.IsTrue(game.SetBombDensity(testDensity));
-
-            game.NewGame();
-
-            Assert.AreEqual((int)Math.Floor(width * height * testDensity), game.AllBombs().Count);
         }
+
+        public void BombDensitySettingSubTest(float TestValue, bool SuccessExpected, MineSweeperGame game)
+        {
+            float StartingDensity = game.BombDensity();
+
+            //checks that the attempt to set the test value produces the expected true/false return
+            Assert.AreEqual(game.SetBombDensity(TestValue), SuccessExpected);
+
+            //checks the the correct change to the value has taken place
+            if (SuccessExpected)
+            {
+                Assert.IsTrue(game.BombDensity() == TestValue);
+            } else
+            {
+                Assert.IsTrue(game.BombDensity() == StartingDensity);
+            }
+
+            //checks that on a new game, the correct number of bombs are placed for the test value
+            game.NewGame();
+            int expectedBombs = (int)Math.Floor(game.Height() * game.Width() * game.BombDensity());
+            Assert.AreEqual(expectedBombs, game.AllBombs().Count);
+        }
+
 
         public void TestCellStateReporting(int width, int height)
         {
@@ -281,26 +297,37 @@ namespace MineSweeperTests
             }
 
             //assert that all the returned indices are bombs, and none of the other cells are bombs
-            for (int x = 0; x < game.Width(); x++) 
+            for (int x = 0; x < game.Width(); x++)
             {
-                for (int y = 0; y < game.Height(); y++ )
+                for (int y = 0; y < game.Height(); y++)
                 {
                     game.RevealCell(x, y);
-                    int i = game.XYToIndex(x, y);   
+                    int i = game.XYToIndex(x, y);
                     bool isBomb = game.CellState(i) == MineSweeperGame.BOMB;
                     if (allBombs.Contains(i))
                     {
                         Assert.IsTrue(isBomb);
-                    } else
+                    }
+                    else
                     {
                         Assert.IsFalse(isBomb);
                     }
-                }               
+                }
             }
-
         }
 
+        [TestMethod]
+        public void TestCellStateInitialHidden()
+        {
+            MineSweeperGame game = new MineSweeperGame(20, 7, 0.2f, 1);
+            game.NewGame();
 
+            for (int i = 0;  i > game.NumberOfCells(); i++) 
+            {
+                int t = game.CellState(0);
+                Assert.IsTrue(t == MineSweeperGame.HIDDEN);
+            }
+        }
 
 
     }

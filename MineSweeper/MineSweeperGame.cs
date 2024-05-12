@@ -13,6 +13,8 @@
         public const int OOB = -3;
 
         public const float DENSITY_DEFAULT = 0.2f;
+        public const float DENSITY_MIN = 0f;
+        public const float DENSITY_MAX = 0.5f;
         public const float LIVES_DEFAULT = 3;
 
         /// <summary>
@@ -127,19 +129,21 @@
         /// Returns the set of indices for all bombs in the grid.
         /// </summary>
         /// <returns></returns>
+        /// Unit Tests: TestAllBombsMethod()
         public HashSet<int> AllBombs()
         {
             return cellGrid.FindBombs();
         }
 
         /// <summary>
-        /// Sets the bomb density. Expected input value between 0 and 0.5 exclusive, other values will return false with no change to game parameters.
+        /// Sets the bomb density. Expected input value between DENSITY_MIN and DENSITY_MAX inclusive, other values will return false with no change to game parameters.
         /// </summary>
-        /// <param name="density">float. Expected between 0 and 0.5 exclusive, other values will return false with no change to game parameters.</param>
+        /// <param name="density">float. Expected between DENSITY_MIN and DENSITY_MAX inclusive, other values will return false with no change to game parameters.</param>
         /// <returns>true if the density has been changed, false otherwise</returns>
+        /// Unit Tests: TestBombDensitySetting()
         public bool SetBombDensity(float density)
         {
-            if (density > 0 && density < 0.5f)
+            if (density <= DENSITY_MAX && density >= DENSITY_MIN)
             {
                 cellGrid.bombDensity = density;
                 return true;
@@ -197,6 +201,7 @@
         /// <param name="y"></param>
         public void RevealCell(int x, int y)
         {
+            //reveal and store number of cells revealed / bomb value
             int r = cellGrid.RevealCell(x, y);
 
             if (r == BOMB)
@@ -588,5 +593,8 @@
         }
 
     }
+
+
+
 
 }
