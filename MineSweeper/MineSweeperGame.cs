@@ -86,6 +86,7 @@
         /// <summary>
         /// Returns the number of cells in the cell grid, or -1 if there is an error.
         /// </summary>
+        /// Unit Test: TestSizeValues()
         public int NumberOfCells()
         {
             return cellGrid.NumberOfCells();
@@ -94,6 +95,7 @@
         /// <summary>
         /// Returns the width of the cell grid.
         /// </summary>
+        /// Unit Test: TestSizeValues()
         public int Width()
         {
             return cellGrid.WIDTH;
@@ -102,6 +104,7 @@
         /// <summary>
         /// Returns the height of the cell grid.
         /// </summary>
+        /// Unit Test: TestSizeValues()
         public int Height()
         {
             return cellGrid.HEIGHT;
@@ -114,6 +117,7 @@
         /// <param name="x">The x location</param>
         /// <param name="y">The y location</param>
         /// <returns>A set of ints representing the indices of neighbouring cells, or an empty set if the given location is invalid.</returns>
+        /// Unit Tests: TestNeighbourAssignment()
         public HashSet<int> NeighboursOf(int x, int y)
         {
             return cellGrid.GenerateNeighboursSet(x, y);
@@ -250,7 +254,7 @@
         /// Due to the cells being stored as a single dimensional array, a new CellGrid must be 
         /// created whenever the grid size is changed. 
         /// </summary>
-        class CellGrid
+        public class CellGrid
         {
             /// <summary>
             /// Width of the grid.
@@ -479,32 +483,12 @@
             }
 
             /// <summary>
-            /// Returns the neighbour set for the given cell, or an empty set if x,y value
-            /// is invalid
-            /// !!!!! Redundant?
-            /// <param name="x">The x position of the cell. Out of bounds values are caught and return an empty set.</param>
-            /// <param name="y">The y position of the cell. Out of bounds values are caught and return an empty set.</param>
-            /// <returns>The set of cells that are neighbours of this one, otherwise an empty set.
-            /// </summary>
-            public HashSet<Cell> NeighboursOf(int x, int y)
-            {
-                int index = XYToIndex(x, y);
-                if (index >= 0)
-                {
-                    return cells[index].neighbours;
-                }
-                else
-                {
-                    return new HashSet<Cell>();
-                }
-            }
-
-            /// <summary>
             /// Calculates the set of indices for the neighbours of a given cell location. 
             /// <param name="x">The x position of the cell. Out of bounds values are caught and return an empty set.</param>
             /// <param name="y">The y position of the cell. Out of bounds values are caught and return an empty set.</param>
             /// <returns>The set of cells that are neighbours of this one, otherwise an empty set.
             /// </summary>
+            /// Unit Tests: TestNeighbourAssignment()
             public HashSet<int> GenerateNeighboursSet(int x, int y)
             {
                 HashSet<int> output = new HashSet<int>();
