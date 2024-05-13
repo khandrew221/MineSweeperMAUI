@@ -1,4 +1,5 @@
 using MineSweeper;
+using static MineSweeper.MineSweeperGame;
 
 namespace MineSweeperTests
 {
@@ -22,7 +23,7 @@ namespace MineSweeperTests
                     TestSizeValues(x, y);
                 }
             }**/
-
+            /*
             //min values
             TestSizeValues(1, 1);
             TestSizeValues(2, 2);
@@ -43,7 +44,7 @@ namespace MineSweeperTests
 
             //high + mid values
             TestSizeValues(25, 50);
-            TestSizeValues(50, 25);
+            TestSizeValues(50, 25);*/
 
             TestCellStateReporting(10, 15);
 
@@ -58,7 +59,7 @@ namespace MineSweeperTests
         public void TestSizeValues(int width, int height)
         {
             //extremely basic test to check size of the grid is correct for given values
-            MineSweeperGame game = new MineSweeperGame(width, height, 0, 1);
+            MineSweeperGame game = new MineSweeperGame(new MineSweeperSettings(width, height, DENSITY_DEFAULT, 1));
 
             Assert.AreEqual(width * height, game.NumberOfCells());
             Assert.AreEqual(height, game.Height());
@@ -74,7 +75,7 @@ namespace MineSweeperTests
         public void TestNeighbourAssignment()
         {
             //tests nieghbour assignment on a 5x5 grid (minimum size to cover all possible neighbour types is 3x3).
-            MineSweeperGame game = new MineSweeperGame(5, 5, 0, 1);
+            MineSweeperGame game = new MineSweeperGame(new MineSweeperSettings(5, 5, DENSITY_DEFAULT, 1));
 
             //Corner tests
             HashSet<int> values = game.NeighboursOf(0, 0);
@@ -201,7 +202,7 @@ namespace MineSweeperTests
             Assert.IsTrue(MineSweeperGame.DENSITY_DEFAULT <= MineSweeperGame.DENSITY_MAX);
 
             /// set up game and test density value is default
-            MineSweeperGame game = new MineSweeperGame(10, 10, MineSweeperGame.DENSITY_DEFAULT, 1);
+            MineSweeperGame game = new MineSweeperGame(new MineSweeperSettings(10, 10, DENSITY_DEFAULT, 1));
             Assert.IsTrue(game.BombDensity() == MineSweeperGame.DENSITY_DEFAULT);
 
             ///test setting density values (DENSITY_MIN to DENSITY_MAX inclusive expected)
@@ -248,7 +249,7 @@ namespace MineSweeperTests
 
         public void TestCellStateReporting(int width, int height)
         {
-            MineSweeperGame game = new MineSweeperGame(width, height, 0.2f, 1);
+            MineSweeperGame game = new MineSweeperGame(new MineSweeperSettings(width, height, DENSITY_DEFAULT, 1));
             game.NewGame();
 
             //test OOB index values
@@ -281,7 +282,7 @@ namespace MineSweeperTests
         [TestMethod]
         public void TestAllBombsMethod()
         {
-            MineSweeperGame game = new MineSweeperGame(10, 10, 0.2f, 1);
+            MineSweeperGame game = new MineSweeperGame(new MineSweeperSettings(10, 10, DENSITY_DEFAULT, 1));
             game.NewGame();
 
             HashSet<int> allBombs = game.AllBombs();
@@ -319,7 +320,7 @@ namespace MineSweeperTests
         [TestMethod]
         public void TestCellStateInitialHidden()
         {
-            MineSweeperGame game = new MineSweeperGame(20, 7, 0.2f, 1);
+            MineSweeperGame game = new MineSweeperGame(new MineSweeperSettings(20, 7, DENSITY_DEFAULT, 1));
             game.NewGame();
 
             for (int i = 0;  i > game.NumberOfCells(); i++) 
@@ -328,6 +329,169 @@ namespace MineSweeperTests
                 Assert.IsTrue(t == MineSweeperGame.HIDDEN);
             }
         }
+
+        [TestMethod]
+        public void TestSettings()
+        {
+            //minimum values testing
+            MineSweeperSettings settings = new MineSweeperSettings(WIDTH_MIN, HEIGHT_MIN, DENSITY_MIN, 1);
+            TestVerifySettings(settings, true);
+            TestApplySettings(settings, true);
+
+            //maximum values testing 
+            settings = new MineSweeperSettings(WIDTH_MAX, HEIGHT_MAX, DENSITY_MAX, 100000);
+            TestVerifySettings(settings, true);
+            TestApplySettings(settings, true);
+
+            //Width values testing
+            settings = new MineSweeperSettings(WIDTH_MIN + 1, HEIGHT_MIN, DENSITY_MIN, 1);
+            TestVerifySettings(settings, true);
+            TestApplySettings(settings, true);
+
+            settings = new MineSweeperSettings(WIDTH_MIN + 2, HEIGHT_MIN, DENSITY_MIN, 1);
+            TestVerifySettings(settings, true);
+            TestApplySettings(settings, true);
+
+            settings = new MineSweeperSettings(WIDTH_MIN + 10, HEIGHT_MIN, DENSITY_MIN, 1);
+            TestVerifySettings(settings, true);
+            TestApplySettings(settings, true);
+
+            settings = new MineSweeperSettings(WIDTH_MIN - 1, HEIGHT_MIN, DENSITY_MIN, 1);
+            TestVerifySettings(settings, false);
+            TestApplySettings(settings, false);
+
+            settings = new MineSweeperSettings(WIDTH_MIN - 2, HEIGHT_MIN, DENSITY_MIN, 1);
+            TestVerifySettings(settings, false);
+            TestApplySettings(settings, false);
+
+            settings = new MineSweeperSettings(WIDTH_MIN - 10, HEIGHT_MIN, DENSITY_MIN, 1);
+            TestVerifySettings(settings, false);
+            TestApplySettings(settings, false);
+
+            //Height values testing
+            settings = new MineSweeperSettings(WIDTH_MAX, HEIGHT_MAX + 1, DENSITY_MAX, 100000);
+            TestVerifySettings(settings, false);
+            TestApplySettings(settings, false);
+
+            settings = new MineSweeperSettings(WIDTH_MAX, HEIGHT_MAX + 2, DENSITY_MAX, 100000);
+            TestVerifySettings(settings, false);
+            TestApplySettings(settings, false);
+
+            settings = new MineSweeperSettings(WIDTH_MAX, HEIGHT_MAX + 10, DENSITY_MAX, 100000);
+            TestVerifySettings(settings, false);
+            TestApplySettings(settings, false);
+
+            settings = new MineSweeperSettings(WIDTH_MAX, HEIGHT_MAX - 1, DENSITY_MAX, 100000);
+            TestVerifySettings(settings, true);
+            TestApplySettings(settings, true);
+
+            settings = new MineSweeperSettings(WIDTH_MAX, HEIGHT_MAX - 2, DENSITY_MAX, 100000);
+            TestVerifySettings(settings, true);
+            TestApplySettings(settings, true);
+
+            settings = new MineSweeperSettings(WIDTH_MAX, HEIGHT_MAX - 10, DENSITY_MAX, 100000);
+            TestVerifySettings(settings, true);
+            TestApplySettings(settings, true);
+
+            //Bomb Density values testing
+            // Tested to 0.0000001 precision; more precision starts to clash with float precision and produce unexpected logic values
+            // Values DENSITY_MAX + (<)0.00000003f accepted, DENSITY_MAX + 0.0000003f fails to be set as expected
+            settings = new MineSweeperSettings(WIDTH_MIN, HEIGHT_MIN, DENSITY_MIN - 0.0000001f, 1);
+            TestVerifySettings(settings, false);
+            TestApplySettings(settings, false);
+
+            settings = new MineSweeperSettings(WIDTH_MIN, HEIGHT_MIN, DENSITY_MIN + 0.0000001f, 1);
+            TestVerifySettings(settings, true);
+            TestApplySettings(settings, true);
+
+            settings = new MineSweeperSettings(WIDTH_MIN, HEIGHT_MIN, DENSITY_MIN - 0.1f, 1);
+            TestVerifySettings(settings, false);
+            TestApplySettings(settings, false);
+
+            settings = new MineSweeperSettings(WIDTH_MIN, HEIGHT_MIN, DENSITY_MIN + 0.1f, 1);
+            TestVerifySettings(settings, true);
+            TestApplySettings(settings, true);
+
+            settings = new MineSweeperSettings(WIDTH_MIN, HEIGHT_MIN, DENSITY_MAX + 0.0000001f, 1);
+            TestVerifySettings(settings, false);
+            TestApplySettings(settings, false);
+
+            settings = new MineSweeperSettings(WIDTH_MIN, HEIGHT_MIN, DENSITY_MAX - 0.0000001f, 1);
+            TestVerifySettings(settings, true);
+            TestApplySettings(settings, true);
+
+            settings = new MineSweeperSettings(WIDTH_MIN, HEIGHT_MIN, DENSITY_MAX + 0.1f, 1);
+            TestVerifySettings(settings, false);
+            TestApplySettings(settings, false);
+
+            settings = new MineSweeperSettings(WIDTH_MIN, HEIGHT_MIN, DENSITY_MAX - 0.1f, 1);
+            TestVerifySettings(settings, true);
+            TestApplySettings(settings, true);
+
+
+            //Maximium lives value testing
+            settings = new MineSweeperSettings(WIDTH_MAX, HEIGHT_MAX, DENSITY_MAX, 2);
+            TestVerifySettings(settings, true);
+            TestApplySettings(settings, true);
+
+            settings = new MineSweeperSettings(WIDTH_MAX, HEIGHT_MAX, DENSITY_MAX, 10);
+            TestVerifySettings(settings, true);
+            TestApplySettings(settings, true);
+
+            settings = new MineSweeperSettings(WIDTH_MAX, HEIGHT_MAX, DENSITY_MAX, 0);
+            TestVerifySettings(settings, false);
+            TestApplySettings(settings, false);
+
+            settings = new MineSweeperSettings(WIDTH_MAX, HEIGHT_MAX, DENSITY_MAX, -1);
+            TestVerifySettings(settings, false);
+            TestApplySettings(settings, false);
+
+            settings = new MineSweeperSettings(WIDTH_MAX, HEIGHT_MAX, DENSITY_MAX, -2);
+            TestVerifySettings(settings, false);
+            TestApplySettings(settings, false);
+
+            settings = new MineSweeperSettings(WIDTH_MAX, HEIGHT_MAX, DENSITY_MAX, -100000);
+            TestVerifySettings(settings, false);
+            TestApplySettings(settings, false);
+
+        }
+
+        public void TestVerifySettings(MineSweeperSettings settings, bool ExpectedResult)
+        {
+            Assert.IsTrue(VerifySettings(settings) == ExpectedResult);
+        }
+
+        public void TestApplySettings(MineSweeperSettings settings, bool ExpectedResult)
+        {
+
+            try
+            {
+                MineSweeperGame game = new(settings);
+
+                //Exception should be thrown for invalid settings
+                Assert.IsTrue(ExpectedResult);
+
+                //test application of grid size
+                Assert.AreEqual(settings.Width * settings.Height, game.NumberOfCells());
+                Assert.AreEqual(settings.Height, game.Height());
+                Assert.AreEqual(settings.Width, game.Width());
+
+                //checks that the correct number of bombs are placed for the settings
+                int expectedBombs = (int)Math.Floor(settings.Height * settings.Width * settings.BombDensity);
+                Assert.AreEqual(expectedBombs, game.AllBombs().Count);
+
+                //check application of maximum lives settings
+                Assert.AreEqual(settings.MaxLives, game.MaxLives);
+
+            } 
+            catch (ArgumentException e)
+            {
+                //ArgumentException should be thrown for invalid settings
+                Assert.IsFalse(ExpectedResult);
+            }
+
+        }
+
 
 
     }

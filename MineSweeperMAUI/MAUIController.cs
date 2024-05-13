@@ -33,7 +33,7 @@ namespace MineSweeperMAUI
 
         public MAUIController()
         {
-            game = new MineSweeperGame(20, 10, 0.2f, 3);
+            game = new MineSweeperGame(new MineSweeperGame.MineSweeperSettings(20, 10, 0.2f, 3));
         }
 
         /// <summary>

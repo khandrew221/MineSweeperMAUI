@@ -18,6 +18,23 @@
         public const float LIVES_DEFAULT = 3;
 
         /// <summary>
+        /// Maximum grid width allowed by the game code itself. Interfaces may enforce lower maximum values on what settings they pass. 
+        /// </summary>
+        public const int WIDTH_MAX = 32;
+        /// <summary>
+        /// Maximum grid height allowed by the game code itself. Interfaces may enforce lower maximum values on what settings they pass. 
+        /// </summary>
+        public const int HEIGHT_MAX = 32;
+        /// <summary>
+        /// Minimum grid width allowed by the game code itself. Interfaces may externally enforce higher minimum values on what settings they pass. 
+        /// </summary>
+        public const int WIDTH_MIN = 3;
+        /// <summary>
+        /// Maximum grid height allowed by the game code itself. Interfaces may externally enforce higher minimum values on what settings they pass. 
+        /// </summary>
+        public const int HEIGHT_MIN = 3;
+
+        /// <summary>
         /// Handles the grid of cells that make up the game
         /// </summary>
         private CellGrid cellGrid;
@@ -39,15 +56,19 @@
         public int MaxLives { get; private set; }
 
         /// <summary>
-        /// Class constructor, initialising a grid of the specified width, height, bomb density, and max lives. Parameters can be changed later. 
-        /// Values expected to be >0.
+        /// Class constructor, initialising with given settings. Throws an ArgumentException if the settings instance cannot be verified as valid values. 
         /// </summary>
-        public MineSweeperGame(int width, int height, float density, int lives)
+        public MineSweeperGame(MineSweeperSettings settings)
         {
-            cellGrid = new CellGrid(width, height, density);
-            BombsTriggered = 0;
-            GameState = 0;
-            MaxLives = lives;
+            if (VerifySettings(settings))
+            {
+                cellGrid = new CellGrid(settings.Width, settings.Height, settings.BombDensity);
+                MaxLives = settings.MaxLives;
+                NewGame();
+            } else
+            {
+                throw new ArgumentException("Attempted to create instance of MineSweeperGame with invalid MineSweeperSettings");
+            }
         }
 
         /// <summary>
@@ -590,6 +611,45 @@
                 return NumberOfCells() - NumberOfBombs();
             }
 
+        }
+
+        /// <summary>
+        /// Contains all settings data required to configure a new game. An interface can create an instance of this to freely manipulate values 
+        /// and only pass them to the game itself on creating a new game. Verification of values can be performed by the main game class
+        /// </summary>
+        public struct MineSweeperSettings
+        {
+            public int Width;
+            public int Height;
+            public float BombDensity;
+            public int MaxLives;
+
+            public MineSweeperSettings(int Width, int Height, float BombDensity, int MaxLives)
+            {
+                this.Width = Width;
+                this.Height = Height;
+                this.BombDensity = BombDensity;
+                this.MaxLives = MaxLives;
+            }
+        }
+
+        /// <summary>
+        /// Verifies that an instance of MineSweeperSettings is not null and contains valid values.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns>True if all values are valid, false otherwise</returns>
+        public static bool VerifySettings(MineSweeperSettings s)
+        {
+            if (s.Equals(null)) return false;
+
+            bool widthTest = (s.Width >= WIDTH_MIN && s.Width <= WIDTH_MAX);
+            bool heightTest = (s.Height >= HEIGHT_MIN && s.Height <= HEIGHT_MAX);
+            bool densTest = (s.BombDensity >= DENSITY_MIN && s.BombDensity <= DENSITY_MAX);
+            bool livesTest = s.MaxLives > 0;
+
+            if (widthTest && heightTest && densTest && livesTest) { return true; }
+
+            return false;
         }
 
     }
