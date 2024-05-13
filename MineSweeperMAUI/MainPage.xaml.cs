@@ -1,4 +1,5 @@
-﻿using System.Xml;
+﻿using MineSweeper;
+using System.Xml;
 
 namespace MineSweeperMAUI
 {
@@ -32,7 +33,8 @@ namespace MineSweeperMAUI
             s.Value = DefaultBombDensity;
 
             //sets up the initial game. Bomb density must be converted from % to decimal
-            controller.BeginGame(DefaultXSize, DefaultYSize, DefaultBombDensity/100.0f, DefaultLives);
+            MineSweeperGame.Settings settings = new MineSweeperGame.Settings(DefaultXSize, DefaultYSize, DefaultBombDensity / 100.0f, DefaultLives);
+            controller.BeginGame(settings);
             UpdateGameSummaryText();
 
             // Make the view's grid of buttons
@@ -94,7 +96,10 @@ namespace MineSweeperMAUI
             int x = (int)s.Value;
             s = (Slider)FindByName("YSlider");
             int y = (int)s.Value;
-            controller.BeginGame(x, y, b / 100.0f, DefaultLives);
+
+            MineSweeperGame.Settings settings = new MineSweeperGame.Settings(x, y, b / 100.0f, DefaultLives);
+
+            controller.BeginGame(settings);
 
             //reset the grid. Since the size may change the grid is removed, remade, and replaced in the layout. 
             gridLayout.Remove(grid);

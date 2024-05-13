@@ -58,7 +58,7 @@
         /// <summary>
         /// Class constructor, initialising with given settings. Throws an ArgumentException if the settings instance cannot be verified as valid values. 
         /// </summary>
-        public MineSweeperGame(MineSweeperSettings settings)
+        public MineSweeperGame(Settings settings)
         {
             if (VerifySettings(settings))
             {
@@ -72,7 +72,7 @@
         }
 
         /// <summary>
-        /// Sets up a new game with current grid size, bomb density, and lives.
+        /// Sets up a new game with current settings.
         /// </summary>
         public void NewGame()
         {
@@ -81,19 +81,21 @@
         }
 
         /// <summary>
-        /// Sets up a new game with the given parameters
-        /// !!! define some argument constraints
+        /// Sets up a new game with the provided settings. Throws an ArgumentException if the settings instance cannot be verified as valid values. 
         /// </summary>
-        /// <param name="x"> grid width</param>
-        /// <param name="y"> grid height</param>
-        /// <param name="b"> bomb density</param>
-        /// <param name="l"> max lives</param>
-        public void NewGame(int x, int y, float b, int l)
+        public void NewGame(Settings settings)
         {
-            cellGrid = new CellGrid(x, y, b);
-            cellGrid.SetGrid();
-            MaxLives = l;
-            ResetStats();
+            if (VerifySettings(settings))
+            {
+                cellGrid = new CellGrid(settings.Width, settings.Height, settings.BombDensity);
+                cellGrid.SetGrid();
+                MaxLives = settings.MaxLives;
+                ResetStats();
+            }
+            else
+            {
+                throw new ArgumentException("Attempted to begin a new game with invalid MineSweeperSettings");
+            }
         }
 
         /// <summary>
@@ -109,7 +111,6 @@
         /// <summary>
         /// Returns the number of cells in the cell grid, or -1 if there is an error.
         /// </summary>
-        /// Unit Test: TestSizeValues()
         public int NumberOfCells()
         {
             return cellGrid.NumberOfCells();
@@ -118,7 +119,6 @@
         /// <summary>
         /// Returns the width of the cell grid.
         /// </summary>
-        /// Unit Test: TestSizeValues()
         public int Width()
         {
             return cellGrid.WIDTH;
@@ -127,7 +127,6 @@
         /// <summary>
         /// Returns the height of the cell grid.
         /// </summary>
-        /// Unit Test: TestSizeValues()
         public int Height()
         {
             return cellGrid.HEIGHT;
@@ -154,25 +153,6 @@
         public HashSet<int> AllBombs()
         {
             return cellGrid.FindBombs();
-        }
-
-        /// <summary>
-        /// Sets the bomb density. Expected input value between DENSITY_MIN and DENSITY_MAX inclusive, other values will return false with no change to game parameters.
-        /// </summary>
-        /// <param name="density">float. Expected between DENSITY_MIN and DENSITY_MAX inclusive, other values will return false with no change to game parameters.</param>
-        /// <returns>true if the density has been changed, false otherwise</returns>
-        /// Unit Tests: TestBombDensitySetting()
-        public bool SetBombDensity(float density)
-        {
-            if (density <= DENSITY_MAX && density >= DENSITY_MIN)
-            {
-                cellGrid.bombDensity = density;
-                return true;
-            }
-            else
-            {
-                return false;
-            }
         }
 
         /// <summary>
@@ -481,23 +461,15 @@
             }
 
             /// <summary>
-            /// TESTING. Returns the number of cells in the cell array.
-            /// !!! Overly defensive, should be no point where cells is null
+            /// Returns the number of cells in the cell array.
             /// </summary>
             public int NumberOfCells()
             {
-                try
-                {
-                    return cells.Length;
-                }
-                catch (ArgumentNullException e)
-                {
-                    return -1;
-                }
+                return cells.Length;
             }
 
             /// <summary>
-            /// Checks if the given x,y values is within the grid. Returns true if it is,
+            /// Checks if the given x,y value is within the grid. Returns true if it is,
             /// false otherwise.
             /// </summary>
             /// <param name="x">The x location</param>
@@ -617,14 +589,14 @@
         /// Contains all settings data required to configure a new game. An interface can create an instance of this to freely manipulate values 
         /// and only pass them to the game itself on creating a new game. Verification of values can be performed by the main game class
         /// </summary>
-        public struct MineSweeperSettings
+        public struct Settings
         {
             public int Width;
             public int Height;
             public float BombDensity;
             public int MaxLives;
 
-            public MineSweeperSettings(int Width, int Height, float BombDensity, int MaxLives)
+            public Settings(int Width, int Height, float BombDensity, int MaxLives)
             {
                 this.Width = Width;
                 this.Height = Height;
@@ -634,11 +606,11 @@
         }
 
         /// <summary>
-        /// Verifies that an instance of MineSweeperSettings is not null and contains valid values.
+        /// Verifies that an instance of Settings is not null and contains valid values.
         /// </summary>
         /// <param name="s"></param>
         /// <returns>True if all values are valid, false otherwise</returns>
-        public static bool VerifySettings(MineSweeperSettings s)
+        public static bool VerifySettings(Settings s)
         {
             if (s.Equals(null)) return false;
 
