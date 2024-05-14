@@ -149,7 +149,6 @@
         /// Returns the set of indices for all bombs in the grid.
         /// </summary>
         /// <returns></returns>
-        /// Unit Tests: TestAllBombsMethod()
         public HashSet<int> AllBombs()
         {
             return cellGrid.FindBombs();
@@ -186,7 +185,7 @@
         /// Converts an (x,y) value to the index of the cell at that position, or OOB const if the (x,y) value is not valid.
         /// </summary>
         /// <param name="x">The x value to be converted. Out of bounds values are caught and return an error.</param>
-        /// <param name="y">The x value to be converted. Out of bounds values are caught and return an error.</param>
+        /// <param name="y">The y value to be converted. Out of bounds values are caught and return an error.</param>
         /// <returns>The index of the cell at this x,y location, otherwise -1 as an error value.</returns>
         public int XYToIndex(int x, int y)
         {

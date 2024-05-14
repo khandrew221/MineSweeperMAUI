@@ -6,6 +6,41 @@ namespace MineSweeperTests
     [TestClass]
     public class UnitTest1
     {
+        /// <summary>
+        /// Tests the basic validity of const values 
+        /// </summary>
+        [TestMethod]
+        public void TestConstValidity() 
+        {
+            //test flag values uniqueness
+            Assert.IsFalse(OOB == BOMB);
+            Assert.IsFalse(OOB == HIDDEN);
+            Assert.IsFalse(BOMB == HIDDEN);
+
+            //test flag values do not clash with >=0 cell state returns
+            Assert.IsTrue(OOB < 0);
+            Assert.IsTrue(BOMB < 0); 
+            Assert.IsTrue(HIDDEN < 0);
+
+            //WIDTH_MIN & WIDTH_MAX
+            Assert.IsTrue(WIDTH_MIN > 0);
+            Assert.IsTrue(WIDTH_MIN <= WIDTH_MAX);
+
+            //HEIGHT_MIN & HEIGHT_MAX
+            Assert.IsTrue(HEIGHT_MIN > 0);
+            Assert.IsTrue(HEIGHT_MIN <=  HEIGHT_MAX);
+
+            //DENSITY MIN, MAX and DEFAULT
+            Assert.IsTrue(DENSITY_MIN >= 0);
+            Assert.IsTrue(DENSITY_MIN <= DENSITY_MAX);
+            Assert.IsTrue(DENSITY_MAX <= 1);
+            Assert.IsTrue(DENSITY_DEFAULT <= DENSITY_MAX);
+            Assert.IsTrue(DENSITY_DEFAULT >= DENSITY_MIN);
+
+            //LIVES_DEFAULT
+            Assert.IsTrue(LIVES_DEFAULT > 0);
+
+        }
 
         /// <summary>
         /// Tests that Settings structs can be accurately verified with VerifySettings(), and that instances of MineSweeperGame can be 
@@ -183,7 +218,7 @@ namespace MineSweeperTests
                 Assert.AreEqual(settings.MaxLives, game.MaxLives);
 
             }
-            catch (ArgumentException e)
+            catch (ArgumentException)
             {
                 //ArgumentException should be thrown for invalid settings
                 Assert.IsFalse(ExpectedResult);
@@ -215,90 +250,41 @@ namespace MineSweeperTests
 
             //Corner tests
             HashSet<int> values = game.NeighboursOf(0, 0);
-            HashSet<int> expectedValues = new HashSet<int>();
-            expectedValues.Add(1);
-            expectedValues.Add(5);
-            expectedValues.Add(6);
+            HashSet<int> expectedValues = new HashSet<int>() { 1, 5, 6 };
             Assert.IsTrue(values.SetEquals(expectedValues));
 
             values = game.NeighboursOf(0, 4);
-            expectedValues = new HashSet<int>();
-            expectedValues.Add(15);
-            expectedValues.Add(16);
-            expectedValues.Add(21);
+            expectedValues = new HashSet<int>() { 15, 16, 21 };
             Assert.IsTrue(values.SetEquals(expectedValues));
 
             values = game.NeighboursOf(4, 0);
-            expectedValues = new HashSet<int>();
-            expectedValues.Add(3);
-            expectedValues.Add(8);
-            expectedValues.Add(9);
+            expectedValues = new HashSet<int>() { 3, 8, 9 };
             Assert.IsTrue(values.SetEquals(expectedValues));
 
             values = game.NeighboursOf(4, 4);
-            expectedValues = new HashSet<int>();
-            expectedValues.Add(18);
-            expectedValues.Add(19);
-            expectedValues.Add(23);
+            expectedValues = new HashSet<int>() { 18, 19, 23 };
             Assert.IsTrue(values.SetEquals(expectedValues));
 
             //Central test
             values = game.NeighboursOf(2, 2);
-            expectedValues = new HashSet<int>();
-            expectedValues.Add(6);
-            expectedValues.Add(7);
-            expectedValues.Add(8);
-            expectedValues.Add(11);
-            expectedValues.Add(13);
-            expectedValues.Add(16);
-            expectedValues.Add(17);
-            expectedValues.Add(18);
+            expectedValues = new HashSet<int>() { 6, 7, 8, 11, 13, 16, 17, 18 };
             Assert.IsTrue(values.SetEquals(expectedValues));
 
-            //Edge tests
+            //Mid Edge tests
             values = game.NeighboursOf(3, 0);
-            expectedValues = new HashSet<int>();
-            expectedValues.Add(2);
-            expectedValues.Add(4);
-            expectedValues.Add(7);
-            expectedValues.Add(8);
-            expectedValues.Add(9);
+            expectedValues = new HashSet<int>() { 2, 4, 7, 8, 9 };
             Assert.IsTrue(values.SetEquals(expectedValues));
 
             values = game.NeighboursOf(0, 1);
-            expectedValues = new HashSet<int>();
-            expectedValues.Add(0);
-            expectedValues.Add(1);
-            expectedValues.Add(6);
-            expectedValues.Add(10);
-            expectedValues.Add(11);
+            expectedValues = new HashSet<int>() { 0, 1, 6, 10, 11 };
             Assert.IsTrue(values.SetEquals(expectedValues));
 
             values = game.NeighboursOf(4, 3);
-            expectedValues = new HashSet<int>();
-            expectedValues.Add(13);
-            expectedValues.Add(14);
-            expectedValues.Add(18);
-            expectedValues.Add(23);
-            expectedValues.Add(24);
-            Assert.IsTrue(values.SetEquals(expectedValues));
-
-            values = game.NeighboursOf(4, 3);
-            expectedValues = new HashSet<int>();
-            expectedValues.Add(13);
-            expectedValues.Add(14);
-            expectedValues.Add(18);
-            expectedValues.Add(23);
-            expectedValues.Add(24);
+            expectedValues = new HashSet<int> {13, 14, 18, 23, 24};
             Assert.IsTrue(values.SetEquals(expectedValues));
 
             values = game.NeighboursOf(1, 4);
-            expectedValues = new HashSet<int>();
-            expectedValues.Add(15);
-            expectedValues.Add(16);
-            expectedValues.Add(17);
-            expectedValues.Add(20);
-            expectedValues.Add(22);
+            expectedValues = new HashSet<int> {15, 16, 17, 20, 22};
             Assert.IsTrue(values.SetEquals(expectedValues));
 
             //out of bounds tests
