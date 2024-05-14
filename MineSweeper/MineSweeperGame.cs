@@ -362,9 +362,7 @@
                                 numRevealed += cell.Reveal();
                             }
                         }
-
                     }
-
                     return numRevealed;
                 }
             }
