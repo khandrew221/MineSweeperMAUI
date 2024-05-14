@@ -264,11 +264,11 @@
             /// <summary>
             /// Width of the grid.
             /// </summary>
-            public int WIDTH { get; private set; }
+            public readonly int WIDTH;
             /// <summary>
             /// Height of the grid.
             /// </summary>
-            public int HEIGHT { get; private set; }
+            public readonly int HEIGHT;
             /// <summary>
             /// Density of bombs.
             /// </summary>
