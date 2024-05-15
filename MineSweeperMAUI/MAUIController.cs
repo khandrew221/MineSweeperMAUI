@@ -94,7 +94,7 @@ namespace MineSweeperMAUI
         /// <returns>An int representing the current state of the given cell.</returns>
         public int CellState(int x, int y)
         {
-            return game.CellState(game.XYToIndex(x,y));
+            return game.CellState(x, y);
         }
 
         /// <summary>

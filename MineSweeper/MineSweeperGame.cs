@@ -170,13 +170,34 @@
         /// BOMB const represents a revealed bomb. 
         /// OOB const represents an out of bounds cell index
         /// </summary>
-        /// <param name="i">the index of the cell</param>
+        /// <param name="x">The x value to be converted. Out of bounds values are caught and return an error.</param>
+        /// <param name="y">The y value to be converted. Out of bounds values are caught and return an error.</param>
         /// <returns>An int representing the current state of the given cell.</returns>
-        public int CellState(int i)
+        public int CellState(int x, int y)
         {
+            int i = XYToIndex(x, y);
             if(i >= 0 && i < NumberOfCells())
             {
                 return cellGrid.State(i);
+            }
+            else { return OOB; }
+        }
+
+        /// <summary>
+        /// Returns an int representing the current underlying state of the given cell, regardless of whether it is currently hidden.
+        /// Revealed non-bomb cells are represented by their number of bomb neighbours (0-8).
+        /// BOMB const represents a revealed bomb. 
+        /// OOB const represents an out of bounds cell index
+        /// </summary>
+        /// <param name="x">The x position of the cell. Out of bounds values are caught and return an error.</param>
+        /// <param name="y">The x position of the cell. Out of bounds values are caught and return an error.</param>
+        /// <returns>An int representing the current state of the given cell.</returns>
+        public int CellUnderlyingState(int x, int y)
+        {
+            int i = XYToIndex(x, y);
+            if (i >= 0 && i < NumberOfCells())
+            {
+                return cellGrid.UnderlyingState(i);
             }
             else { return OOB; }
         }
@@ -186,7 +207,7 @@
         /// </summary>
         /// <param name="x">The x value to be converted. Out of bounds values are caught and return an error.</param>
         /// <param name="y">The y value to be converted. Out of bounds values are caught and return an error.</param>
-        /// <returns>The index of the cell at this x,y location, otherwise -1 as an error value.</returns>
+        /// <returns>The index of the cell at this x,y location, otherwise OOB as an error value.</returns>
         public int XYToIndex(int x, int y)
         {
             return cellGrid.XYToIndex(x, y);
@@ -323,17 +344,21 @@
                 {
                     if (!isHidden)
                     {
-                        if (isBomb)
-                        {
-                            return BOMB;
-                        } 
-                        else
-                        {
-                            return NeighborBombs();
-                        }
+                        return UnderlyingState();
                     }
                     return HIDDEN;
                 } 
+
+                /// <summary>
+                /// Returns the underlying state of the cell, regardless of whether it is currently hidden. The
+                /// state is an int representing the number of neighbouring cells which are bombs, or the BOMB 
+                /// flag constant if the cell itself contains a bomb.
+                /// </summary>
+                /// <returns></returns>
+                public int UnderlyingState()
+                {
+                    return isBomb ? BOMB : NeighborBombs();
+                }
 
                 /// <summary>
                 /// Reveals the cell if it is hidden. Does nothing if the cell is not hidden.
@@ -435,6 +460,17 @@
             public int State(int i)
             {
                 return cells[i].State();
+            }
+
+            /// <summary>
+            /// Returns an int representing the current underlying state of a cell in the game grid, ignoring the hidden status
+            /// Non-bomb cells are represented by their number of bomb neighbours (0-8).
+            /// BOMB const represents a revealed bomb. 
+            /// </summary>
+            /// <returns>An int representing the current state of the given cell.</returns>
+            public int UnderlyingState(int i)
+            {
+                return cells[i].UnderlyingState();
             }
 
             /// <summary>

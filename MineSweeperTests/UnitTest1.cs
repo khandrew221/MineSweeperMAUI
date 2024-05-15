@@ -301,18 +301,27 @@ namespace MineSweeperTests
             game.NewGame();
 
             //test OOB index values are reported correctly
-            Assert.AreNotEqual(game.CellState(0), OOB);
-            Assert.AreNotEqual(game.CellState(width * height - 1), OOB);
-            Assert.AreNotEqual(game.CellState(width * height / 2), OOB);
-            Assert.AreEqual(game.CellState(width * height), OOB);
-            Assert.AreEqual(game.CellState(width * height * 2), OOB);
-            Assert.AreEqual(game.CellState(-1), OOB);
-            Assert.AreEqual(game.CellState(-100), OOB);
+            Assert.AreNotEqual(game.CellState(0, 0), OOB);
+            Assert.AreNotEqual(game.CellState(width-1, height-1), OOB);
+            Assert.AreNotEqual(game.CellState(width / 2, height / 2), OOB);
+            Assert.AreEqual(game.CellState(width, height), OOB);
+            Assert.AreEqual(game.CellState(width -1, height), OOB);
+            Assert.AreEqual(game.CellState(width, height - 1), OOB);
+            Assert.AreEqual(game.CellState(width * 2, height * 2), OOB);
+            Assert.AreEqual(game.CellState(-1, 0), OOB);
+            Assert.AreEqual(game.CellState(-100, 0), OOB);
+            Assert.AreEqual(game.CellState(0, -1), OOB);
+            Assert.AreEqual(game.CellState(0, -100), OOB);
+            Assert.AreEqual(game.CellState(-1, -1), OOB);
+            Assert.AreEqual(game.CellState(-100, -100), OOB);
 
             //initial setup; all cells should be hidden
-            for (int i = 0; i < width * height; i++)
+            for (int x = 0; x < width; x++)
             {
-                Assert.AreEqual(game.CellState(i), HIDDEN);
+                for (int y = 0; y < height; y++)
+                {
+                    Assert.AreEqual(game.CellState(x, y), HIDDEN);
+                }                
             }
 
             //test reveal random cell on fresh board 20 times
@@ -330,7 +339,7 @@ namespace MineSweeperTests
 
                 //check state of revealed cell
                 int index = game.XYToIndex(rX, rY);
-                int state = game.CellState(index);
+                int state = game.CellState(rX, rY);
                 Assert.AreNotEqual(state, OOB); //should not be outside the grid; note this could be issue with random cell picks above
                 Assert.AreNotEqual(state, HIDDEN); //has been revealed, should not register as hidden
                 if (allBombs.Contains(index))
@@ -375,7 +384,7 @@ namespace MineSweeperTests
                 {
                     game.RevealCell(x, y);
                     int i = game.XYToIndex(x, y);
-                    bool isBomb = game.CellState(i) == BOMB;
+                    bool isBomb = game.CellState(x, y) == BOMB;
                     if (allBombs.Contains(i))
                     {
                         Assert.IsTrue(isBomb);
