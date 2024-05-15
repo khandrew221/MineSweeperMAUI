@@ -350,7 +350,7 @@ namespace MineSweeperTests
                 else
                 {
                     //a revealed non-bomb should report an integer between 0 and 8 inclusive
-                    //!!! testing of precise values based on neighbouring bombs required
+                    //testing of precise values based on neighbouring bombs in TestUnderlyingState()
                     Assert.IsTrue(state >= 0);
                     Assert.IsTrue(state <= 8);
                 }
@@ -395,6 +395,85 @@ namespace MineSweeperTests
                     }
                 }
             }
+        }
+
+        [TestMethod]
+        public void TestUnderlyingState()
+        {
+            
+            MineSweeperGame game = new MineSweeperGame(new Settings(11, 11, DENSITY_DEFAULT, LIVES_DEFAULT));
+
+            //store full underlying state grid
+            int[,] grid = new int[11, 11];
+            for (int x = 0; x < game.Width(); x++)
+            {
+                for (int y = 0; y < game.Height(); y++)
+                {
+                    grid[x,y] = game.CellUnderlyingState(x, y);
+                }        
+            }
+
+            //check for validity: should contain the correct number of bombs, and 
+            //correct values for cells based on number of bomb neighbours
+            int totalBombs = 0;
+            for (int x = 0; x < game.Width(); x++)
+            {
+                for (int y = 0; y < game.Height(); y++)
+                {
+                    //if this cell is a bomb incremement total bombs 
+                    if (grid[x,y] == BOMB)
+                    {
+                        totalBombs++;
+                    } 
+                    else
+                    {
+                        //find the correct number of neighbouring bombs
+                        int nBombs = 0;
+
+                        bool xEdgeL = (x - 1) < 0;
+                        bool xEdgeR = (x + 1) >= game.Width();
+                        bool yEdgeU = (y - 1) < 0;
+                        bool yEdgeB = (y + 1) >= game.Height();
+
+                        if (!xEdgeL)
+                        {
+                            if (grid[x - 1, y] == BOMB)
+                                nBombs++;
+                            if (!yEdgeU)
+                                if (grid[x - 1, y - 1] == BOMB)
+                                    nBombs++;
+                            if (!yEdgeB)
+                                if (grid[x - 1, y + 1] == BOMB)
+                                    nBombs++;
+                        }
+
+                        if (!yEdgeU)
+                            if (grid[x, y - 1] == BOMB)
+                                nBombs++;
+                        if (!yEdgeB)
+                            if (grid[x, y + 1] == BOMB)
+                                nBombs++;
+
+                        if (!xEdgeR)
+                        {
+                            if (grid[x + 1, y] == BOMB)
+                                nBombs++;
+                            if (!yEdgeU)
+                                if (grid[x + 1, y - 1] == BOMB)
+                                    nBombs++;
+                            if (!yEdgeB)
+                                if (grid[x + 1, y + 1] == BOMB)
+                                    nBombs++;
+                        }
+
+                        //test against state reported number
+                        Assert.AreEqual(grid[x, y], nBombs);
+                    }
+                }
+            }
+
+            //check the correct number of bombs were found
+            Assert.AreEqual(totalBombs, game.AllBombs().Count);
         }
 
     }

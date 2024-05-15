@@ -15,7 +15,7 @@
         public const float DENSITY_DEFAULT = 0.2f;
         public const float DENSITY_MIN = 0f;
         public const float DENSITY_MAX = 0.5f;
-        public const float LIVES_DEFAULT = 3;
+        public const int LIVES_DEFAULT = 3;
 
         /// <summary>
         /// Maximum grid width allowed by the game code itself. Interfaces may enforce lower maximum values on what settings they pass. 
