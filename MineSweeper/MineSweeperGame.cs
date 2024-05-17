@@ -546,7 +546,6 @@
 
             /// <summary>
             /// Generates a random set of bomb locations of the given size.
-            /// !!!Unhappy about this implementation. Risk of infinite loop if size > WIDTH * HEIGHT. 
             /// </summary>
             /// <param name="size">The size of the set to be generated</param>
             /// <returns>A set of random integers between 0(inclusive) and WIDTH * HEIGHT(exclusive) of the given length.</returns>
@@ -554,6 +553,9 @@
             {
                 Random rnd = new Random();
                 HashSet<int> output = new HashSet<int>();
+
+                //catch values that would lead to an infinite while loop below
+                if (size > WIDTH * HEIGHT) size = WIDTH * HEIGHT;
 
                 //add values to the set until it reaches the required size 
                 while (output.Count < size)
