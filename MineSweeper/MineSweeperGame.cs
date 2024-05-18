@@ -238,7 +238,7 @@
         /// <summary>
         /// Updates the game state based on current count of lives, revealed cells, and bombs triggered.
         /// </summary>
-        public void UpdateGameState()
+        private void UpdateGameState()
         {
             //game ends in loss if out of lives
             if (LivesRemaining() < 1)
