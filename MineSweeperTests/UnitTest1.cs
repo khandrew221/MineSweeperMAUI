@@ -476,6 +476,132 @@ namespace MineSweeperTests
             Assert.AreEqual(totalBombs, game.AllBombs().Count);
         }
 
-    }
 
+        [TestMethod]
+        public void TestGameStateReporting()
+        {
+            MineSweeperGame game = new MineSweeperGame(new Settings(11, 11, DENSITY_DEFAULT, LIVES_DEFAULT));
+
+            //test initial game state
+            Assert.AreEqual(game.SafeReveals, 0);
+            Assert.AreEqual(game.BombsTriggered, 0);
+            Assert.AreEqual(game.GameState, 0);
+
+            int oldSafeReveals = game.SafeReveals;
+            int newSafeReveals = game.SafeReveals;
+            int oldBombsTriggered = game.BombsTriggered;
+            int newBombsTriggered = game.BombsTriggered;
+            int trueBombsTriggered = 0;
+            int trueSafeReveals = 0;
+
+            //reveal entire grid, checking as we go
+            for (int x = 0; x < game.Width(); x++)
+            {
+                for (int y = 0; y < game.Height(); y++)
+                {
+                    bool isHidden = game.CellState(x, y) == HIDDEN;
+
+                    if (isHidden)
+                    {
+                        //reveal cell and record old and new values
+                        oldSafeReveals = game.SafeReveals;
+                        oldBombsTriggered = game.BombsTriggered;
+                        game.RevealCell(x, y);
+                        newSafeReveals = game.SafeReveals;
+                        newBombsTriggered = game.BombsTriggered;
+
+                        int[] trueVals = GameStateData(game);
+                        trueBombsTriggered = trueVals[2];
+                        trueSafeReveals = trueVals[1];
+
+                        int cs = game.CellState(x, y);
+
+                        //no safe reveal change; assert bomb reveal
+                        if (oldSafeReveals == newSafeReveals)
+                        {
+                            Assert.AreEqual(cs, BOMB);
+                            Assert.AreEqual(newBombsTriggered - oldBombsTriggered, 1);
+                        } 
+                        else
+                        {
+                            ///valid cell reveal
+                            Assert.IsTrue(cs >= 0 && cs <= 8);
+                            if (cs == 0)
+                            {
+                                //check that extra cells were revealed on a no-neighbour cell being revealed
+                                //!!! should not run into issues with current setup but outlyers possible!!!!
+                                Assert.IsTrue(newSafeReveals - oldSafeReveals > 1);
+                            } 
+                            else
+                            {
+                                //non-zero states should reveal a single cell only 
+                                Assert.AreEqual(newSafeReveals - oldSafeReveals, 1);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        //no change should take place on reveal
+                        oldSafeReveals = game.SafeReveals;
+                        oldBombsTriggered = game.BombsTriggered;
+                        game.RevealCell(x, y);
+                        newSafeReveals = game.SafeReveals;
+                        newBombsTriggered = game.BombsTriggered;
+
+                        int[] trueVals = GameStateData(game);
+                        trueBombsTriggered = trueVals[2];
+                        trueSafeReveals = trueVals[1];
+
+                        Assert.AreEqual(oldSafeReveals, newSafeReveals);
+                        Assert.AreEqual(oldBombsTriggered, newBombsTriggered);
+                    }
+
+                    //check that inner tally and brute force count return the same value
+                    Assert.AreEqual(trueSafeReveals, newSafeReveals);
+                    Assert.AreEqual(trueBombsTriggered, newBombsTriggered);
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// Returns brute force counts of hidden cells, revealed safe cells, and revealed bombs, as reported by CellState(). 
+        /// Counts returned in an int array
+        /// [0] hidden cells
+        /// [1] revealed safe cells
+        /// [2] revealed bombs
+        /// </summary>
+        /// <param name="g"></param>
+        /// <returns></returns>
+        public int[] GameStateData(MineSweeperGame game)
+        {
+            int[] output = { 0, 0, 0 };
+
+            for (int x = 0; x < game.Width(); x++)
+            {
+                for (int y = 0; y < game.Height(); y++)
+                {
+                    int cs = game.CellState(x, y);
+                    if (cs == HIDDEN)
+                    {
+                        output[0]++;
+                    }
+                    else if (cs == BOMB)
+                    {
+                        output[2]++;
+                    }
+                    else if (cs >= 0 && cs < 9)
+                    {
+                        output[1]++;
+                    }
+                }
+            }
+
+            //check that the correct number of cells have been counted
+            Assert.AreEqual(output.Sum(), game.NumberOfCells());
+
+            return output;
+        }
+
+     }
 }
