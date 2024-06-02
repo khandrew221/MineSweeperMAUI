@@ -1,4 +1,5 @@
 using MineSweeper;
+using System.Collections.Generic;
 using static MineSweeper.MineSweeperGame;
 
 namespace MineSweeperTests
@@ -225,9 +226,8 @@ namespace MineSweeperTests
         }
 
         /// <summary>
-        /// Includes testing for 
-        /// MineSweeperGame.NeighboursOf()
-        /// CellGrid.GenerateNeighboursSet()
+        /// Tests if grid neighbours are being assigned correctly. 
+        /// !!! only one test case
         /// </summary>
         [TestMethod]
         public void TestNeighbourAssignment()
@@ -291,6 +291,63 @@ namespace MineSweeperTests
             Assert.IsTrue(values.Count == 0);
         }
 
+        /// <summary>
+        /// Checks that the underlying state of the grid is valid. Includes:
+        /// Correct number of bombs placed
+        /// Correct number of neighbouring bombs reported
+        /// </summary>
+        [TestMethod]
+        public void TestUnderlyingState()
+        {
+            MineSweeperGame game = new MineSweeperGame(new Settings(11, 11, DENSITY_DEFAULT, LIVES_DEFAULT));
+
+            //store full underlying state grid
+            int[,] grid = new int[11, 11];
+            for (int x = 0; x < game.Width(); x++)
+            {
+                for (int y = 0; y < game.Height(); y++)
+                {
+                    grid[x, y] = game.CellUnderlyingState(x, y);
+                }
+            }
+
+            //check for validity: should contain the correct number of bombs, and 
+            //correct values for cells based on number of bomb neighbours
+            int totalBombs = 0;
+            for (int x = 0; x < game.Width(); x++)
+            {
+                for (int y = 0; y < game.Height(); y++)
+                {
+                    //if this cell is a bomb incremement total bombs 
+                    if (grid[x, y] == BOMB)
+                    {
+                        totalBombs++;
+                    }
+                    else
+                    {
+                        //find the correct number of neighbouring bombs
+                        int nBombs = 0;
+
+                        List<(int, int)> neighbours = NeighborsOfCell(x, y, game.Width(), game.Height());
+
+                        foreach (var n in neighbours)
+                        {
+                            if (grid[n.Item1, n.Item2] == BOMB) nBombs++;
+                        }
+
+                        //test against state reported number
+                        Assert.AreEqual(grid[x, y], nBombs);
+                    }
+                }
+            }
+
+            //check the correct number of bombs were found
+            Assert.AreEqual(totalBombs, game.AllBombs().Count);
+        }
+
+        /// <summary>
+        /// Tests CellState().
+        /// </summary>
         [TestMethod]
         public void TestCellStateReporting()
         {
@@ -355,10 +412,11 @@ namespace MineSweeperTests
                     Assert.IsTrue(state <= 8);
                 }
             }
-
-
         }
 
+        /// <summary>
+        /// Tests the AllBombs() method to be certain that it is reporting accurately.
+        /// </summary>
         [TestMethod]
         public void TestAllBombsMethod()
         {
@@ -397,86 +455,9 @@ namespace MineSweeperTests
             }
         }
 
-        [TestMethod]
-        public void TestUnderlyingState()
-        {
-            
-            MineSweeperGame game = new MineSweeperGame(new Settings(11, 11, DENSITY_DEFAULT, LIVES_DEFAULT));
-
-            //store full underlying state grid
-            int[,] grid = new int[11, 11];
-            for (int x = 0; x < game.Width(); x++)
-            {
-                for (int y = 0; y < game.Height(); y++)
-                {
-                    grid[x,y] = game.CellUnderlyingState(x, y);
-                }        
-            }
-
-            //check for validity: should contain the correct number of bombs, and 
-            //correct values for cells based on number of bomb neighbours
-            int totalBombs = 0;
-            for (int x = 0; x < game.Width(); x++)
-            {
-                for (int y = 0; y < game.Height(); y++)
-                {
-                    //if this cell is a bomb incremement total bombs 
-                    if (grid[x,y] == BOMB)
-                    {
-                        totalBombs++;
-                    } 
-                    else
-                    {
-                        //find the correct number of neighbouring bombs
-                        int nBombs = 0;
-
-                        bool xEdgeL = (x - 1) < 0;
-                        bool xEdgeR = (x + 1) >= game.Width();
-                        bool yEdgeU = (y - 1) < 0;
-                        bool yEdgeB = (y + 1) >= game.Height();
-
-                        if (!xEdgeL)
-                        {
-                            if (grid[x - 1, y] == BOMB)
-                                nBombs++;
-                            if (!yEdgeU)
-                                if (grid[x - 1, y - 1] == BOMB)
-                                    nBombs++;
-                            if (!yEdgeB)
-                                if (grid[x - 1, y + 1] == BOMB)
-                                    nBombs++;
-                        }
-
-                        if (!yEdgeU)
-                            if (grid[x, y - 1] == BOMB)
-                                nBombs++;
-                        if (!yEdgeB)
-                            if (grid[x, y + 1] == BOMB)
-                                nBombs++;
-
-                        if (!xEdgeR)
-                        {
-                            if (grid[x + 1, y] == BOMB)
-                                nBombs++;
-                            if (!yEdgeU)
-                                if (grid[x + 1, y - 1] == BOMB)
-                                    nBombs++;
-                            if (!yEdgeB)
-                                if (grid[x + 1, y + 1] == BOMB)
-                                    nBombs++;
-                        }
-
-                        //test against state reported number
-                        Assert.AreEqual(grid[x, y], nBombs);
-                    }
-                }
-            }
-
-            //check the correct number of bombs were found
-            Assert.AreEqual(totalBombs, game.AllBombs().Count);
-        }
-
-
+        /// <summary>
+        /// Tests that SafeReveals and BombsTriggered (and by extension, GameState) are updating correctly.
+        /// </summary>
         [TestMethod]
         public void TestGameStateReporting()
         {
@@ -603,5 +584,240 @@ namespace MineSweeperTests
             return output;
         }
 
-     }
+        /// <summary>
+        /// Runs the multireveal test multiple times with random grid sizes
+        /// </summary>
+        [TestMethod]
+        public void TestMultipleReveal()
+        {
+            int iterations = 20;
+            Random rnd = new Random();
+
+            for (int i = 0; i < iterations; i++)
+            {
+                TestMultipleRevealSub(rnd.Next(WIDTH_MIN, WIDTH_MAX), rnd.Next(HEIGHT_MIN, HEIGHT_MAX));
+            }
+        }
+
+
+        /// <summary>
+        /// Tests the reveal of multiple cells on revealing a cell with no bomb neighbours
+        /// </summary>
+        public void TestMultipleRevealSub(int xsize, int ysize)
+        {
+            MineSweeperGame game = new MineSweeperGame(new Settings(xsize, ysize, 0.1f, LIVES_DEFAULT));
+
+            //store full underlying state grid
+            int[,] grid = new int[xsize, ysize];
+            for (int x = 0; x < game.Width(); x++)
+            {
+                for (int y = 0; y < game.Height(); y++)
+                {
+                    grid[x, y] = game.CellUnderlyingState(x, y);
+                }
+            }
+
+            bool MultiRevealFound = false;
+            List<(int, int)> processReveals = new List<(int, int)> ();
+
+            for (int x = 0; x < game.Width(); x++)
+            {
+                for (int y = 0; y < game.Height(); y++)
+                {
+                    int safeReveals = game.SafeReveals;
+                    game.RevealCell(x, y);
+                    processReveals.Add((x, y));
+
+                    if (game.SafeReveals - safeReveals > 1)
+                    {
+
+                        int numReveals = game.SafeReveals - safeReveals;
+                        List<(int, int)> reveals = CheckMultiRevealOnUnderlyingGridRecursion(new List<(int, int)>(), grid, x, y);
+
+                        //multireveal only occurs on a 0 state cell
+                        Assert.AreEqual(game.CellState(x, y), 0);
+
+                        //Console.WriteLine("Multireveal found at " + x + ", " + y);
+                        //Console.WriteLine("Raw numReveals: " + numReveals);
+
+                        //due to search, some cells that should be revealed according to the raw count provided from the underlying grid 
+                        //may already have been revealed. Adjusts numReveals appropriately before comparison.
+                        if (x > 0)
+                        {
+                            numReveals+=3;
+                        }
+                        if (y > 0)
+                        {
+                            numReveals++;
+                        }
+
+                        //the (adjusted) number of reveals from game state data should match the number found by analysisng the 
+                        //underlying state grid seperately in test methods
+                        Assert.AreEqual(numReveals, reveals.Count);
+
+                        //all the cells in processReveals and reveals should be unhidden, all others should be hidden
+                        for (int y1 = 0; y1 < game.Height(); y1++)
+                        {
+                            for (int x1 = 0; x1 < game.Width(); x1++)
+                            {
+                                int a = game.CellState(x1, y1);
+                                var l = (x1, y1);
+                                if (reveals.Contains(l) || processReveals.Contains(l))
+                                {
+                                    Assert.AreNotEqual(a, HIDDEN);
+                                } 
+                                else
+                                {
+                                    Assert.AreEqual(a, HIDDEN);
+                                }
+                            }
+                        }
+
+                        /*
+                        //console out allows some manual checking of results
+                        Console.WriteLine("Full Grid:");
+                        for (int y1 = 0; y1 < game.Height(); y1++)
+                        {
+                            for (int x1 = 0; x1 < game.Width(); x1++)
+                            {
+                                int a = grid[x1, y1];
+                                if (a == BOMB)
+                                    Console.Write("B");
+                                else
+                                    Console.Write(grid[x1, y1]);    
+                            }
+                            Console.WriteLine("");
+                        }
+
+                        Console.WriteLine(numReveals);
+                        Console.WriteLine(reveals.Count);
+
+                        foreach (var reveal in reveals)
+                        {
+                            Console.WriteLine(reveal.Item1 +  ", " + reveal.Item2);
+                        }*/
+
+
+
+                        MultiRevealFound = true;
+                        break;
+                    }
+                }
+                if (MultiRevealFound)
+                    break;
+            }
+        }
+
+
+        /// <summary>
+        /// Returns the list of positions that should have been revealed if the given cell was revealed on the given grid. Enter with empty currList.
+        /// </summary>
+        /// <param name="grid"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
+        public List<(int, int)> CheckMultiRevealOnUnderlyingGridRecursion(List<(int, int)> currList, int[,] grid, int x, int y)
+        {
+            List<(int, int)> newList = currList;
+
+            var t = (x, y);
+            if (!newList.Contains(t))
+            {
+                newList.Add(t);
+            }
+
+            //multireveal 
+            if (grid[x, y] == 0)
+            {
+                int XSize = grid.GetLength(0);
+                int YSize = grid.GetLength(1);
+
+                List<(int, int)> neighbors = NeighborsOfCell(x, y, XSize, YSize);
+
+                foreach ( var n in neighbors )
+                {
+                    if (!newList.Contains(n))
+                    {
+                        newList.Add(n);
+                        if (grid[n.Item1, n.Item2] == 0)
+                        {
+                            newList = CheckMultiRevealOnUnderlyingGridRecursion(newList, grid, n.Item1, n.Item2);
+                        }
+                    }
+                }
+            }
+
+            return newList;
+        }
+
+        /// <summary>
+        /// Returns the neighbour set of the given x,y position given a grid with width w and height h
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="w"></param>
+        /// <param name="h"></param>
+        /// <returns></returns>
+        public List<(int, int)> NeighborsOfCell(int x, int y, int w, int h)
+        {
+            List<(int, int)> output = new List<(int, int)>();
+
+            bool xEdgeL = (x - 1) < 0;
+            bool xEdgeR = (x + 1) >= w;
+            bool yEdgeU = (y - 1) < 0;
+            bool yEdgeB = (y + 1) >= h;
+
+
+            if (!xEdgeL)
+            {
+                var t = (x - 1, y);
+                output.Add(t);
+
+                if (!yEdgeU)
+                {
+                    t = (x - 1, y -1);
+                    output.Add(t);
+                }
+
+                if (!yEdgeB)
+                {
+                    t = (x - 1, y + 1);
+                    output.Add(t);
+                }
+            }
+
+            if (!xEdgeR)
+            {
+                var t = (x + 1, y);
+                output.Add(t);
+
+                if (!yEdgeU)
+                {
+                    t = (x + 1, y - 1);
+                    output.Add(t);
+                }
+
+                if (!yEdgeB)
+                {
+                    t = (x + 1, y + 1);
+                    output.Add(t);
+                }
+            }
+
+            if (!yEdgeU)
+            {
+                var t = (x, y - 1);
+                output.Add(t);
+            }
+
+            if (!yEdgeB)
+            {
+                var t = (x, y + 1);
+                output.Add(t);
+            }
+
+            return output;
+
+        }
+    }
 }
