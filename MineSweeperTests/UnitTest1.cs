@@ -422,6 +422,7 @@ namespace MineSweeperTests
         {
             MineSweeperGame game = new MineSweeperGame(new Settings(10, 10, DENSITY_DEFAULT, 1));
             game.NewGame();
+            game.ZenMode = true;
 
             HashSet<int> allBombs = game.AllBombs();
 
@@ -462,6 +463,7 @@ namespace MineSweeperTests
         public void TestGameStateReporting()
         {
             MineSweeperGame game = new MineSweeperGame(new Settings(11, 11, DENSITY_DEFAULT, LIVES_DEFAULT));
+            game.ZenMode = true; //required for free testing
 
             //test initial game state
             Assert.AreEqual(game.SafeReveals, 0);
@@ -606,6 +608,7 @@ namespace MineSweeperTests
         public void TestMultipleRevealSub(int xsize, int ysize)
         {
             MineSweeperGame game = new MineSweeperGame(new Settings(xsize, ysize, 0.1f, LIVES_DEFAULT));
+            game.ZenMode = true;
 
             //store full underlying state grid
             int[,] grid = new int[xsize, ysize];
@@ -696,8 +699,6 @@ namespace MineSweeperTests
                         {
                             Console.WriteLine(reveal.Item1 +  ", " + reveal.Item2);
                         }*/
-
-
 
                         MultiRevealFound = true;
                         break;
@@ -819,5 +820,94 @@ namespace MineSweeperTests
             return output;
 
         }
+
+        [TestMethod]
+        public void TestGameEndAndZenMode()
+        {
+
+            //create a bomb dense game
+            MineSweeperGame game = new MineSweeperGame(new Settings(10, 10, DENSITY_MAX, LIVES_DEFAULT));
+            game.ZenMode = false;
+
+            //test normal mode
+            for (int x = 0; x < game.Width(); x++)
+            {
+                for (int y = 0; y < game.Height(); y++)
+                {
+                    //if cell is hidden, try a reveal
+                    if (game.CellState(x, y) == HIDDEN)
+                    {
+                        //if game is active, cell should be revealed
+                        if (game.GameState == 0)
+                        {
+                            game.RevealCell(x, y);
+                            Assert.AreEqual(game.CellState(x, y), game.CellUnderlyingState(x, y));
+                        }
+                        else
+                        {
+                            game.RevealCell(x, y);
+                            //otherwise, the cell should remain hidden
+                            Assert.AreEqual(game.CellState(x, y), HIDDEN);
+                        }
+                    }
+                }
+            }
+
+            
+            game.NewGame();
+            game.ZenMode = true;
+
+            //test zen mode
+            for (int x = 0; x < game.Width(); x++)
+            {
+                for (int y = 0; y < game.Height(); y++)
+                {
+                    //if cell is hidden, try a reveal
+                    if (game.CellState(x, y) == HIDDEN)
+                    {
+                        //cell should be revealed regardless of other factors
+                        game.RevealCell(x, y);
+                        Assert.AreEqual(game.CellState(x, y), game.CellUnderlyingState(x, y));
+                    }
+                }
+            }
+
+
+            game.NewGame();
+            game.ZenMode = false;
+
+            //test entering zen mode after game loss
+            for (int x = 0; x < game.Width(); x++)
+            {
+                for (int y = 0; y < game.Height(); y++)
+                {
+                    //if cell is hidden, try a reveal
+                    if (game.CellState(x, y) == HIDDEN)
+                    {
+                        //if game is active, cell should be revealed
+                        if (game.GameState == 0 || game.ZenMode)
+                        {
+                            game.RevealCell(x, y);
+                            Assert.AreEqual(game.CellState(x, y), game.CellUnderlyingState(x, y));
+                        }
+                        else
+                        {
+                            game.RevealCell(x, y);
+                            //otherwise, the cell should remain hidden
+                            Assert.AreEqual(game.CellState(x, y), HIDDEN);
+                        }
+                    }
+
+                    //check for fail state and turn on zen mode if so
+                    if (game.GameState == -1 && !game.ZenMode)
+                    {
+                        game.ZenMode = true;
+                    }
+                }
+            }
+
+
+        }
+
     }
 }

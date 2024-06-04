@@ -54,6 +54,11 @@
         /// Stores the maximum lives for this game
         /// </summary>
         public int MaxLives { get; private set; }
+        /// <summary>
+        /// Tracks if the game is in Zen Mode (true = no endgame state for losing all lives). 
+        /// This is held outside the usual settings structure because it can be freely changed during play.
+        /// </summary>
+        public bool ZenMode = false;
 
         /// <summary>
         /// Class constructor, initialising with given settings. Throws an ArgumentException if the settings instance cannot be verified as valid values. 
@@ -214,24 +219,29 @@
         }
 
         /// <summary>
-        /// Reveals the given cell. Does nothing if the location is not within the grid, or if the given cell is already revealed.
+        /// Reveals the given cell. Does nothing if the location is not within the grid, if the given cell is already revealed, or if the game is not in a play state or Zen Mode.
         /// If the cell is revealed and has no bomb neighbours, it reveals all adjacent cells, and adds the number revealed to the count of safely revealed cells. 
-        /// If the cell was a bomb, increments BombsTriggered
+        /// If the cell was a bomb, increments BombsTriggered.
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
         public void RevealCell(int x, int y)
         {
-            //reveal and store number of cells revealed / bomb value
-            int r = cellGrid.RevealCell(x, y);
-
-            if (r == BOMB)
+            if (GameState == 0 || ZenMode == true)
             {
-                BombsTriggered++;
-                UpdateGameState();
-            } else if (r > 0) {
-                SafeReveals += r;
-                UpdateGameState();
+                //reveal and store number of cells revealed / bomb value
+                int r = cellGrid.RevealCell(x, y);
+
+                if (r == BOMB)
+                {
+                    BombsTriggered++;
+                    UpdateGameState();
+                }
+                else if (r > 0)
+                {
+                    SafeReveals += r;
+                    UpdateGameState();
+                }
             }
         }
 
@@ -622,7 +632,8 @@
 
         /// <summary>
         /// Contains all settings data required to configure a new game. An interface can create an instance of this to freely manipulate values 
-        /// and only pass them to the game itself on creating a new game. Verification of values can be performed by the main game class
+        /// and only pass them to the game itself on creating a new game. Verification of values can be performed by the main game class.
+        /// Zen Mode setting is held outside the usual settings structure because it can be freely changed during play.
         /// </summary>
         public struct Settings
         {
