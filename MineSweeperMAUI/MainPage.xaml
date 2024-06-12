@@ -3,87 +3,96 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MineSweeperMAUI.MainPage">
 
-    <ScrollView>
-        <VerticalStackLayout
-            Spacing="25"
-            Padding="30,0"
-            VerticalOptions="Center"
-            x:Name="grid1">
-            <!-- x:name added so the grid can be found by name and changed at runtime -->
+    <Grid Margin="20"
+          RowDefinitions="Auto,Auto,*,Auto">
 
-            <Frame 
+        <Label Grid.Row="0" x:Name="GameSummary" Text="Game State" />
+
+        <ScrollView x:Name="scrollView"
+                    Grid.Row="2"
+                    Orientation="Both"
+                    VerticalOptions="FillAndExpand"
+                    HorizontalOptions="FillAndExpand">
+            <VerticalStackLayout Spacing="25"
+                                 Padding="30,0"
+                                 VerticalOptions="Center"
+                                 x:Name="grid1">
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <Frame
+            Grid.Row="1"
+            MaximumWidthRequest="400">
+            <Button Text="New Game" 
+                    Pressed="NewGameButtonPressed"/>
+        </Frame>
+
+        <Frame 
+                Grid.Row="3"
                 x:Name="SettingsFrame"
                 BorderColor="Black"
                 MaximumWidthRequest="400"
                 HasShadow="True">
-                <VerticalStackLayout x:Name="SettingsLayout">
-                    <Label Text="SETTINGS"/>
-                    <HorizontalStackLayout>
-                        <Label x:Name="BombDensityValue"
+            <VerticalStackLayout x:Name="SettingsLayout">
+                <Label Text="SETTINGS"/>
+                <HorizontalStackLayout>
+                    <Label x:Name="BombDensityValue"
                             Text=""
                             HorizontalOptions="Center"
                             VerticalOptions="Center" 
                             MinimumWidthRequest="33"/>
-                        <Label x:Name="BombDensityLabel"
+                    <Label x:Name="BombDensityLabel"
                             Text="Bombs"
                             HorizontalOptions="Center"
                             VerticalOptions="Center" 
                             MinimumWidthRequest="100"/>
-                        <Slider x:Name="BombDensity" 
+                    <Slider x:Name="BombDensity" 
                             MinimumWidthRequest="150"
                             Maximum="50"
                             Minimum="10"
                             ValueChanged="OnSliderValueChanged" />
-                    </HorizontalStackLayout>
-                    <VerticalStackLayout x:Name="XYSlidersMain">
-                        <HorizontalStackLayout>
-                            <Label x:Name="XSliderValue"
+                </HorizontalStackLayout>
+                <VerticalStackLayout x:Name="XYSlidersMain">
+                    <HorizontalStackLayout>
+                        <Label x:Name="XSliderValue"
                                Text=""
                                HorizontalOptions="Center"
                                VerticalOptions="Center" 
                                MinimumWidthRequest="33"/>
-                            <Label x:Name="XSliderLabel"
+                        <Label x:Name="XSliderLabel"
                                Text="Width"
                                HorizontalOptions="Center"
                                VerticalOptions="Center" 
                                MinimumWidthRequest="100"/>
-                            <Slider x:Name="XSlider" 
+                        <Slider x:Name="XSlider" 
                                MinimumWidthRequest="150"
                                Maximum="50"
                                Minimum="5"
                                ValueChanged="OnSliderValueChanged" />
-                        </HorizontalStackLayout>
-                        <HorizontalStackLayout>
-                            <Label x:Name="YSliderValue"
+                    </HorizontalStackLayout>
+                    <HorizontalStackLayout>
+                        <Label x:Name="YSliderValue"
                                Text=""
                                HorizontalOptions="Center"
                                VerticalOptions="Center" 
                                MinimumWidthRequest="33"/>
-                            <Label x:Name="YSliderLabel"
+                        <Label x:Name="YSliderLabel"
                                Text="Height"
                                HorizontalOptions="Center"
                                VerticalOptions="Center" 
                                MinimumWidthRequest="100"/>
-                            <Slider x:Name="YSlider" 
+                        <Slider x:Name="YSlider" 
                                MinimumWidthRequest="150"
                                Maximum="50"
                                Minimum="5"
                                ValueChanged="OnSliderValueChanged" />
-                        </HorizontalStackLayout>
-                    </VerticalStackLayout>
+                    </HorizontalStackLayout>
                 </VerticalStackLayout>
-            </Frame>
-
-            <Frame>
-                <Button Text="New Game" 
-                    Pressed="NewGameButtonPressed"/>
-            </Frame>
+            </VerticalStackLayout>
+        </Frame>
 
 
 
-            <Label x:Name="GameSummary" Text="Game State" />
-
-        </VerticalStackLayout>
-    </ScrollView>
+    </Grid>
 
 </ContentPage>

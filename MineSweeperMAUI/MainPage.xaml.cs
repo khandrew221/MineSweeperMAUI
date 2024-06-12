@@ -21,9 +21,11 @@ namespace MineSweeperMAUI
         {
             InitializeComponent();
 
+            
             //store the location of the grid so it can be manipulated by code later
             gridLayout = (VerticalStackLayout)FindByName("grid1");
 
+            
             //initialise setting sliders. Has to be done here since xaml Value does not work
             Slider s = (Slider)FindByName("XSlider");
             s.Value = DefaultXSize;
@@ -35,7 +37,8 @@ namespace MineSweeperMAUI
             //sets up the initial game. Bomb density must be converted from % to decimal
             MineSweeperGame.Settings settings = new MineSweeperGame.Settings(DefaultXSize, DefaultYSize, DefaultBombDensity / 100.0f, DefaultLives);
             controller.BeginGame(settings);
-            UpdateGameSummaryText();
+            //UpdateGameSummaryText();
+            
 
             // Make the view's grid of buttons
             MakeButtonGrid(controller, CellSize);
