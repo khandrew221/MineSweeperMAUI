@@ -20,11 +20,11 @@
         /// <summary>
         /// Maximum grid width allowed by the game code itself. Interfaces may enforce lower maximum values on what settings they pass. 
         /// </summary>
-        public const int WIDTH_MAX = 32;
+        public const int WIDTH_MAX = 100;
         /// <summary>
         /// Maximum grid height allowed by the game code itself. Interfaces may enforce lower maximum values on what settings they pass. 
         /// </summary>
-        public const int HEIGHT_MAX = 32;
+        public const int HEIGHT_MAX = 100;
         /// <summary>
         /// Minimum grid width allowed by the game code itself. Interfaces may externally enforce higher minimum values on what settings they pass. 
         /// </summary>
