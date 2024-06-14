@@ -5,40 +5,25 @@ namespace MineSweeperMAUI
 {
     public partial class MainPage : ContentPage
     {
-        const int DefaultXSize = 10;
-        const int DefaultYSize = 10;
-        const int DefaultBombDensity = 20;
-        const int DefaultLives = 3;
 
         int CellSize = 50;
+        public MAUIController controller = ((App)Application.Current).controller;
 
         //Variables required by the view
         Grid grid = new Grid();
         VerticalStackLayout gridLayout;
-        MAUIController controller = new MAUIController(); //This encapsulates interface with the game code.
 
         public MainPage()
         {
             InitializeComponent();
 
-            
             //store the location of the grid so it can be manipulated by code later
             gridLayout = (VerticalStackLayout)FindByName("grid1");
 
-            
-            //initialise setting sliders. Has to be done here since xaml Value does not work
-            Slider s = (Slider)FindByName("XSlider");
-            s.Value = DefaultXSize;
-            s = (Slider)FindByName("YSlider");
-            s.Value = DefaultYSize;
-            s = (Slider)FindByName("BombDensity");
-            s.Value = DefaultBombDensity;
-
             //sets up the initial game. Bomb density must be converted from % to decimal
-            MineSweeperGame.Settings settings = new MineSweeperGame.Settings(DefaultXSize, DefaultYSize, DefaultBombDensity / 100.0f, DefaultLives);
-            controller.BeginGame(settings);
-            //UpdateGameSummaryText();
-            
+            //MineSweeperGame.Settings settings = new MineSweeperGame.Settings(DefaultXSize, DefaultYSize, DefaultBombDensity / 100.0f, DefaultLives);
+            ((App)Application.Current).NewGame();
+            UpdateGameSummaryText();
 
             // Make the view's grid of buttons
             MakeButtonGrid(controller, CellSize);
@@ -54,35 +39,7 @@ namespace MineSweeperMAUI
         public void UpdateGameSummaryText()
         {
             Label l = (Label)FindByName("GameSummary");
-            l.Text = String.Format("Lives left {0}, Bombs Triggered {1}", controller.LivesRemaining(), controller.BombsTriggered());
-        }
-
-        /// <summary>
-        /// Controls slider code
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void OnSliderValueChanged(object sender, EventArgs e)
-        {
-            Slider s = (Slider)sender;
-            String id = s.StyleId;
-
-            switch (id)
-            {
-                case "BombDensity":
-                    Label l = (Label)FindByName("BombDensityValue");
-                    l.Text = String.Format("{0}%", (int)s.Value);
-                    break;
-                case "XSlider":
-                    l = (Label)FindByName("XSliderValue");
-                    l.Text = String.Format("{0}", (int)s.Value);
-                    break;
-                case "YSlider":
-                    l = (Label)FindByName("YSliderValue");
-                    l.Text = String.Format("{0}", (int)s.Value);
-                    break;
-            }
-
+            l.Text = String.Format("Lives left {0}, Bombs Triggered {1}, Safe Cells Found {2}, Game State {3}", controller.LivesRemaining(), controller.BombsTriggered(), controller.SafeReveals(), controller.GameState());
         }
 
         /// <summary>
@@ -93,16 +50,7 @@ namespace MineSweeperMAUI
         private void NewGameButtonPressed(object sender, EventArgs e)
         {
             //resart the backend game component with the current settings
-            Slider s = (Slider)FindByName("BombDensity");
-            int b = (int)s.Value;
-            s = (Slider)FindByName("XSlider");
-            int x = (int)s.Value;
-            s = (Slider)FindByName("YSlider");
-            int y = (int)s.Value;
-
-            MineSweeperGame.Settings settings = new MineSweeperGame.Settings(x, y, b / 100.0f, DefaultLives);
-
-            controller.BeginGame(settings);
+            ((App)Application.Current).NewGame();
 
             //reset the grid. Since the size may change the grid is removed, remade, and replaced in the layout. 
             gridLayout.Remove(grid);
@@ -138,11 +86,21 @@ namespace MineSweeperMAUI
             {
                 for (int y = 0; y < height; y++)
                 {
-                    GridButton btn = new GridButton(x, y, controller);
+                    GridButton btn = new GridButton(x, y, ((App)Application.Current).controller);
                     btn.SetButton();
                     grid.Add(btn, x, y);
                 }
             }
+        }
+
+        /// <summary>
+        /// Navigate to the settings pages
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SettingsButtonPressed(object sender, EventArgs e)
+        {
+            Navigation.PushAsync(new SettingsPage());
         }
     }
 

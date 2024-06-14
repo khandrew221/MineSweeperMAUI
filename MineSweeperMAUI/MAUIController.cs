@@ -10,7 +10,7 @@ namespace MineSweeperMAUI
     /// <summary>
     /// Controller for MineSweeperGame class. Encapsulates MineSweeperGame and provides an interface for a MAUI view setup. 
     /// </summary>
-    internal class MAUIController
+    public class MAUIController
     {
 
         /// <summary>

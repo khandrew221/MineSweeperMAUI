@@ -4,12 +4,14 @@
              x:Class="MineSweeperMAUI.MainPage">
 
     <Grid Margin="20"
-          RowDefinitions="Auto,Auto,*,Auto">
+          RowDefinitions="Auto,Auto,*,Auto"
+          ColumnDefinitions="*,*">
 
-        <Label Grid.Row="0" x:Name="GameSummary" Text="Game State" />
+        <Label Grid.Row="0" Grid.ColumnSpan="2" x:Name="GameSummary" Text="Game State" />
 
         <ScrollView x:Name="scrollView"
                     Grid.Row="2"
+                    Grid.ColumnSpan="3"
                     Orientation="Both"
                     VerticalOptions="FillAndExpand"
                     HorizontalOptions="FillAndExpand">
@@ -23,75 +25,19 @@
 
         <Frame
             Grid.Row="1"
+            Grid.Column="0"
             MaximumWidthRequest="400">
             <Button Text="New Game" 
                     Pressed="NewGameButtonPressed"/>
         </Frame>
 
-        <Frame 
-                Grid.Row="3"
-                x:Name="SettingsFrame"
-                BorderColor="Black"
-                MaximumWidthRequest="400"
-                HasShadow="True">
-            <VerticalStackLayout x:Name="SettingsLayout">
-                <Label Text="SETTINGS"/>
-                <HorizontalStackLayout>
-                    <Label x:Name="BombDensityValue"
-                            Text=""
-                            HorizontalOptions="Center"
-                            VerticalOptions="Center" 
-                            MinimumWidthRequest="33"/>
-                    <Label x:Name="BombDensityLabel"
-                            Text="Bombs"
-                            HorizontalOptions="Center"
-                            VerticalOptions="Center" 
-                            MinimumWidthRequest="100"/>
-                    <Slider x:Name="BombDensity" 
-                            MinimumWidthRequest="150"
-                            Maximum="50"
-                            Minimum="10"
-                            ValueChanged="OnSliderValueChanged" />
-                </HorizontalStackLayout>
-                <VerticalStackLayout x:Name="XYSlidersMain">
-                    <HorizontalStackLayout>
-                        <Label x:Name="XSliderValue"
-                               Text=""
-                               HorizontalOptions="Center"
-                               VerticalOptions="Center" 
-                               MinimumWidthRequest="33"/>
-                        <Label x:Name="XSliderLabel"
-                               Text="Width"
-                               HorizontalOptions="Center"
-                               VerticalOptions="Center" 
-                               MinimumWidthRequest="100"/>
-                        <Slider x:Name="XSlider" 
-                               MinimumWidthRequest="150"
-                               Maximum="50"
-                               Minimum="5"
-                               ValueChanged="OnSliderValueChanged" />
-                    </HorizontalStackLayout>
-                    <HorizontalStackLayout>
-                        <Label x:Name="YSliderValue"
-                               Text=""
-                               HorizontalOptions="Center"
-                               VerticalOptions="Center" 
-                               MinimumWidthRequest="33"/>
-                        <Label x:Name="YSliderLabel"
-                               Text="Height"
-                               HorizontalOptions="Center"
-                               VerticalOptions="Center" 
-                               MinimumWidthRequest="100"/>
-                        <Slider x:Name="YSlider" 
-                               MinimumWidthRequest="150"
-                               Maximum="50"
-                               Minimum="5"
-                               ValueChanged="OnSliderValueChanged" />
-                    </HorizontalStackLayout>
-                </VerticalStackLayout>
-            </VerticalStackLayout>
+        <Frame
+            Grid.Row="1"
+            Grid.Column="1"
+            MaximumWidthRequest="400">
+            <Button Text="Settings" 
+                    Pressed="SettingsButtonPressed"/>
         </Frame>
-
 
 
     </Grid>
