@@ -33,7 +33,7 @@ public partial class SettingsPage : ContentPage
     {
         s_XSlider.Value = ((App)Application.Current).settings.Width;
         s_YSlider.Value = ((App)Application.Current).settings.Height;
-        s_BombSlider.Value = (int)((App)Application.Current).settings.BombDensity * 100;
+        s_BombSlider.Value = (int)(((App)Application.Current).settings.BombDensity * 100);
 
         UpdateLabels();
     }
@@ -62,7 +62,7 @@ public partial class SettingsPage : ContentPage
         {
             case "BombDensity":
                 s_BombSliderLabel.Text = String.Format("{0}%", (int)s_BombSlider.Value);
-                ((App)Application.Current).settings.BombDensity = (float)(s_BombSlider.Value / 100.0);
+                ((App)Application.Current).settings.BombDensity = (float)(s_BombSlider.Value / 100.0f);
                 break;
             case "XSlider":
                 s_XSliderLabel.Text = String.Format("{0}", (int)s_XSlider.Value);
