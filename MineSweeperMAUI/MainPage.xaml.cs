@@ -30,7 +30,6 @@ namespace MineSweeperMAUI
 
             //and add it to the view
             gridLayout.Add(grid);
-
         }
 
         /// <summary>
@@ -86,7 +85,7 @@ namespace MineSweeperMAUI
             {
                 for (int y = 0; y < height; y++)
                 {
-                    GridButton btn = new GridButton(x, y, ((App)Application.Current).controller);
+                    GridButton btn = new GridButton(x, y, this);
                     btn.SetButton();
                     grid.Add(btn, x, y);
                 }
@@ -101,6 +100,23 @@ namespace MineSweeperMAUI
         private void SettingsButtonPressed(object sender, EventArgs e)
         {
             Navigation.PushAsync(new SettingsPage());
+        }
+
+        /// <summary>
+        /// Checks for and executes game end scenarios (win and lose) 
+        /// </summary>
+        public void GameEnd()
+        {
+
+            if (controller.GameState() == -1)
+            {
+                DisplayAlert("GAME OVER!", "", "OK");
+            }
+            if (controller.GameState() == 1)
+            {
+                DisplayAlert("YOU WIN!", "", "OK");
+            }
+
         }
     }
 
@@ -132,11 +148,11 @@ namespace MineSweeperMAUI
         /// </summary>
         public int y { get; private set; }
         /// <summary>
-        /// Link to the game controller
+        /// Link to the host page. Includes game controller.
         /// </summary>
-        public MAUIController controller { get; private set; }
+        public MainPage MainPage { get; private set; }
 
-        public GridButton(int x, int y, MAUIController controller)
+        public GridButton(int x, int y, MainPage page)
         {
             //Sets the default style for GridButton objects.
             // style found in resource/styles/styles.xaml
@@ -147,12 +163,13 @@ namespace MineSweeperMAUI
             Clicked += new System.EventHandler(GridButtonClicked);
             this.x = x;
             this.y = y;
-            this.controller = controller;
+            this.MainPage = page;
         }
 
         private void GridButtonClicked(object sender, EventArgs e)
         {
-            controller.RevealCell(x, y);
+            //reveal cell in the game object
+            MainPage.controller.RevealCell(x, y);
 
             //reset all grid squares, since multiple cells may be effected
             Grid g = this.Parent as Grid;
@@ -161,8 +178,13 @@ namespace MineSweeperMAUI
                 btn.SetButton();
             }
 
-            Label l = (Label)FindByName("GameSummary");
-            l.Text = String.Format("Lives left {0}, Bombs Triggered {1}, Safe Cells Found {2}, Game State {3}", controller.LivesRemaining(), controller.BombsTriggered(), controller.SafeReveals(), controller.GameState());
+            MainPage.UpdateGameSummaryText();
+
+            //if game state is inactive after the reveal, run game end code
+            if (MainPage.controller.GameState() != 0)
+            {
+                MainPage.GameEnd();
+            }
         }
 
         /// <summary>
@@ -170,7 +192,7 @@ namespace MineSweeperMAUI
         /// </summary>
         public void SetButton()
         {
-            int state = controller.CellState(x, y);
+            int state = MainPage.controller.CellState(x, y);
             this.Text = CellText(state);
 
             if (state == MAUIController.BOMB)
