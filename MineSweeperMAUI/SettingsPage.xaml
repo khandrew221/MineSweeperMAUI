@@ -65,6 +65,23 @@
                               Minimum="5"
                               ValueChanged="OnSliderValueChanged" />
                 </HorizontalStackLayout>
+                <HorizontalStackLayout>
+                    <Label x:Name="LivesValue"
+                              Text=""
+                              HorizontalOptions="Center"
+                              VerticalOptions="Center" 
+                              MinimumWidthRequest="33"/>
+                    <Label x:Name="LivesSliderLabel"
+                              Text="Lives"
+                              HorizontalOptions="Center"
+                              VerticalOptions="Center" 
+                              MinimumWidthRequest="100"/>
+                    <Slider x:Name="Lives" 
+                              MinimumWidthRequest="150"
+                              Maximum="10"
+                              Minimum="1"
+                              ValueChanged="OnSliderValueChanged" />
+                </HorizontalStackLayout>                
             </VerticalStackLayout>
         </VerticalStackLayout>
     </Frame>

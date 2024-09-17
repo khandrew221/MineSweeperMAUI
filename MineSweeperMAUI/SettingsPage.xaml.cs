@@ -7,10 +7,12 @@ public partial class SettingsPage : ContentPage
     Label s_XSliderLabel;
     Label s_YSliderLabel;
     Label s_BombSliderLabel;
+    Label s_LivesSliderLabel;
 
     Slider s_XSlider;
     Slider s_YSlider;
     Slider s_BombSlider;
+    Slider s_LivesSlider;
 
 
     public SettingsPage()
@@ -21,10 +23,12 @@ public partial class SettingsPage : ContentPage
         s_XSlider = (Slider)FindByName("XSlider");
         s_YSlider = (Slider)FindByName("YSlider");
         s_BombSlider = (Slider)FindByName("BombDensity");
+        s_LivesSlider = (Slider)FindByName("Lives");
 
         s_XSliderLabel = (Label)FindByName("XSliderValue");
         s_YSliderLabel = (Label)FindByName("YSliderValue");
         s_BombSliderLabel = (Label)FindByName("BombDensityValue");
+        s_LivesSliderLabel = (Label)FindByName("LivesValue");
 
         ReadSettings();
     }
@@ -34,7 +38,7 @@ public partial class SettingsPage : ContentPage
         s_XSlider.Value = ((App)Application.Current).settings.Width;
         s_YSlider.Value = ((App)Application.Current).settings.Height;
         s_BombSlider.Value = (int)(((App)Application.Current).settings.BombDensity * 100);
-
+        s_LivesSlider.Value = ((App)Application.Current).settings.MaxLives;
         UpdateLabels();
     }
 
@@ -43,7 +47,7 @@ public partial class SettingsPage : ContentPage
         s_XSliderLabel.Text = String.Format("{0}", (int)s_XSlider.Value);
         s_YSliderLabel.Text = String.Format("{0}", (int)s_YSlider.Value);
         s_BombSliderLabel.Text = String.Format("{0}%", (int)s_BombSlider.Value);
-
+        s_LivesSliderLabel.Text = String.Format("{0}", (int)s_LivesSlider.Value);
     }
 
 
@@ -71,6 +75,10 @@ public partial class SettingsPage : ContentPage
             case "YSlider":
                 s_YSliderLabel.Text = String.Format("{0}", (int)s_YSlider.Value);
                 ((App)Application.Current).settings.Height = (int)(s_YSlider.Value);
+                break;
+            case "Lives":
+                s_LivesSliderLabel.Text = String.Format("{0}", (int)s_LivesSlider.Value);
+                ((App)Application.Current).settings.MaxLives = (int)(s_LivesSlider.Value);
                 break;
         }
 
